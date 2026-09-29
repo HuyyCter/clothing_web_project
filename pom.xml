@@ -71,9 +71,9 @@
         <version>${hibernate.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.hibernate</groupId>
+    	<groupId>org.hibernate.orm</groupId>
     	<artifactId>hibernate-hikaricp</artifactId>
-    	<version>${hibernate.version}</version> <!-- Thay phiên bản phù hợp với phiên bản Hibernate bạn đang dùng -->
+    	<version>${hibernate.version}</version>
 	</dependency>
     <!-- ===== Database + Connection Pool ===== -->
     <dependency>
