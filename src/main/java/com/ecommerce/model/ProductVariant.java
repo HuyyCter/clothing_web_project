@@ -2,12 +2,13 @@ package com.ecommerce.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import com.ecommerce.model.ProductVariantStatus;
 
 @Entity
 @Table(name = "product_variants")
 public class ProductVariant {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -21,14 +22,17 @@ public class ProductVariant {
     @Column(name = "color")
     private String color;
 
-    @Column(name = "sku", unique = true)
+    @Column(name = "sku")
     private String sku;
 
     @Column(name = "price", precision = 12, scale = 2)
     private BigDecimal price;
 
-    public ProductVariant() {
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ProductVariantStatus status;
+
+    public ProductVariant() {}
 
     public ProductVariant(Product product, String size, String color, String sku, BigDecimal price) {
         this.product = product;
@@ -36,6 +40,7 @@ public class ProductVariant {
         this.color = color;
         this.sku = sku;
         this.price = price;
+        this.status = ProductVariantStatus.AVAILABLE;
     }
 
     // ==========================================
@@ -87,5 +92,13 @@ public class ProductVariant {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public ProductVariantStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductVariantStatus status) {
+        this.status = status;
     }
 }

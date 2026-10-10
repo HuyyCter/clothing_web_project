@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "product_images")
 public class ProductImage {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -20,17 +20,12 @@ public class ProductImage {
     @Column(name = "color")
     private String color;
 
-    @Column(name = "is_primary")
-    private boolean isPrimary = false;
+    public ProductImage() {}
 
-    public ProductImage() {
-    }
-
-    public ProductImage(Product product, String imageUrl, String color, boolean isPrimary) {
+    public ProductImage(Product product, String imageUrl, String color) {
         this.product = product;
         this.imageUrl = imageUrl;
         this.color = color;
-        this.isPrimary = isPrimary;
     }
 
     // ==========================================
@@ -66,13 +61,5 @@ public class ProductImage {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public boolean isPrimary() {
-        return isPrimary;
-    }
-
-    public void setPrimary(boolean primary) {
-        isPrimary = primary;
     }
 }

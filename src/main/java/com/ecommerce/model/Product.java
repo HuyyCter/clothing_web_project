@@ -7,8 +7,8 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 public class Product {
-	
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -17,26 +17,25 @@ public class Product {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    // 1 Product - N ProductVariant (Association)
-    @OneToMany(mappedBy = "product")
-    private List<ProductVariant> variants = new ArrayList<>();
 
     // 1 Product - N ProductImage (Composition)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
-    public Product() {
-    }
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
+    public Product() {}
 
     public Product(String name, String description, Category category) {
         this.name = name;
         this.description = description;
         this.category = category;
+        this.isActive = true;
     }
 
     // ==========================================
@@ -74,14 +73,6 @@ public class Product {
         this.category = category;
     }
 
-    public List<ProductVariant> getVariants() {
-        return variants;
-    }
-
-    public void setVariants(List<ProductVariant> variants) {
-        this.variants = variants;
-    }
-
     public List<ProductImage> getImages() {
         return images;
     }
@@ -89,9 +80,17 @@ public class Product {
     public void setImages(List<ProductImage> images) {
         this.images = images;
     }
-    
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     // ==========================================
     // METHODS
     // ==========================================
-    
+
 }

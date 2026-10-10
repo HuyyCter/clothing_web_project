@@ -10,7 +10,7 @@
 | ORM                   | Hibernate/JPA (Jakarta Persistence, thuần)          | Ánh xạ Model (Entity) ↔ bảng PostgreSQL, quản lý transaction thủ công qua `EntityManager`. Có thể đổi sang JDBC thuần nếu giảng viên yêu cầu (xem `progress-tracker.md` — Open Questions). |
 | Database              | PostgreSQL                                          | Lưu toàn bộ dữ liệu quan hệ: user, sản phẩm, biến thể, đơn hàng, voucher, review...          |
 | Connection Pool       | HikariCP                                            | Quản lý pool connection tới PostgreSQL, cấu hình trong `persistence.xml`.                  |
-| Validation            | Jakarta Bean Validation (Hibernate Validator)       | Validate field đơn giản qua annotation trên DTO (`@NotBlank`, `@Email`, `@Size`...).       |
+| Validation            | Validate thủ công (if/else) trong class `validator/` | Validate field đơn giản (bắt buộc nhập, độ dài...) tại Controller, trả thông báo lỗi để hiển thị lại form. |
 | Password Hashing      | jBCrypt                                             | Hash và verify mật khẩu user, không lưu plain text.                                        |
 | File/Image Storage    | Cloudinary (free tier)                              | Lưu ảnh sản phẩm (theo từng màu), trả về URL lưu trong PostgreSQL.                         |
 | Payment Gateway       | VNPay + MoMo (sandbox)                              | Redirect thanh toán online + xử lý callback (IPN) xác nhận kết quả.                        |
@@ -41,10 +41,11 @@
   Object, dùng để truyền dữ liệu giữa Controller ↔ JSP và
   Controller ↔ Model. Tách biệt hoàn toàn với Model (không bao
   giờ để Model lộ ra ngoài Controller/JSP).
-- `src/main/java/com/ecommerce/validator/` — Custom
-  validator cho business rule phức tạp không thể diễn đạt bằng
-  annotation (vd kiểm tra tồn kho đủ, kiểm tra voucher hợp lệ:
-  còn active, còn hạn, còn lượt dùng, đơn đạt tối thiểu).
+- `src/main/java/com/ecommerce/validator/` — Validator viết
+  thủ công (if/else), mỗi nhóm chức năng 1 class (vd
+  `CategoryValidator`), kiểm tra dữ liệu form (bắt buộc nhập, độ
+  dài...) và trả về thông báo lỗi. Business rule phức tạp (tồn kho,
+  voucher...) vẫn nằm trong business method của Model.
 - `src/main/java/com/ecommerce/exception/` — Custom
   Exception hierarchy (`BusinessException`, `NotFoundException`,
   `UnauthorizedException`, `ValidationException`) và
