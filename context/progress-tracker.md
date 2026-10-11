@@ -29,10 +29,17 @@ change.
 - [x] `src/main/webapp/WEB-INF/views/admin/order-detail.jsp` — Chi tiết đơn hàng, snapshot thông tin giao hàng, cập nhật state machine trạng thái đơn.
 - [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` — Danh sách quản lý mã giảm giá (voucher).
 - [x] `src/main/webapp/WEB-INF/views/admin/voucher-form.jsp` — Form thêm/sửa voucher (% giảm, đơn tối thiểu, giảm tối đa, hạn dùng, giới hạn lượt dùng).
+- [x] `src/main/java/com/ecommerce/model/Address.java` — Bổ sung `recipientName` và `phone` vào Address entity khớp đặc tả UML và snapshot đơn hàng.
+- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt (không lưu plaintext).
+- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` — Repository truy vấn User (findByEmail, findByPhone, existsByEmail/existsByPhone, save, delete, phân trang).
+- [x] `src/test/java/com/ecommerce/util/PasswordUtilTest.java` — Unit test cho thuật toán mã hóa mật khẩu.
+- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet điều hướng và xử lý xác thực Đăng nhập sử dụng thuần lower-level Jakarta Servlet API (`HttpServlet`, `HttpSession`, `RequestDispatcher`), thiết lập tên logo/guest vào session và forward đến `login.jsp`.
+- [x] `src/main/webapp/index.jsp` — Điều hướng liên kết tài khoản ở menu sang `/login`, cập nhật hiển thị động tên logo sang Guest qua session/Servlet API.
+- [x] `src/main/webapp/login.jsp` — Cập nhật form action theo contextPath, hiển thị thông báo lỗi và trạng thái người dùng/Guest.
 
 ## In Progress
 
-- None yet.
+- Module HAS: Hoàn thiện tầng Service & Controller cho Authentication (Login, Register, Logout).
 
 ## Next Up
 

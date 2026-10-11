@@ -15,3 +15,14 @@ src/main/resources/META-INF/persistence.xml
 
 # Log
 *.log
+
+# IDE
+.idea/
+.smarttomcat/
+
+# Local working docs (giữ local trên máy, không commit git)
+task.md
+CONTEXT_CHECK.md
+context_check.md
+HAS_CONTEXT_VERIFICATION_REPORT.md
+
