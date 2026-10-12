@@ -1,447 +1,443 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-        <!DOCTYPE html>
-        <html lang="vi">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm</title>
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Sản phẩm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f8f9fa;
+        }
 
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 40px;
-                    background: #f8f9fa;
-                }
+        h1 {
+            margin-bottom: 30px;
+        }
 
-                h1 {
-                    margin-bottom: 30px;
-                }
+        /* SEARCH / FILTER / SORT */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-                /* SEARCH / FILTER / SORT */
-                .toolbar {
-                    display: flex;
-                    gap: 12px;
-                    margin-bottom: 30px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                }
+        .toolbar input,
+        .toolbar select,
+        .toolbar button {
+            height: 42px;
+            padding: 0 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            box-sizing: border-box;
+        }
 
-                .toolbar input,
-                .toolbar select,
-                .toolbar button {
-                    height: 42px;
-                    padding: 0 14px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background: white;
-                    box-sizing: border-box;
-                }
+        .toolbar input {
+            width: 300px;
+        }
 
-                .toolbar input {
-                    width: 300px;
-                }
+        .toolbar button {
+            cursor: pointer;
+        }
 
-                .toolbar button {
-                    cursor: pointer;
-                }
+        /* PRODUCT GRID */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 24px;
+        }
 
-                /* PRODUCT GRID */
-                .product-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap: 24px;
-                }
+        /* PRODUCT CARD */
+        .product-card {
+            position: relative;
+            min-width: 0;
+        }
 
-                /* PRODUCT CARD */
-                .product-card {
-                    position: relative;
-                    min-width: 0;
-                }
+        /* WISHLIST */
+        .wishlist-form {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+            margin: 0;
+        }
 
-                /* WISHLIST */
-                .wishlist-form {
-                    position: absolute;
-                    top: 12px;
-                    right: 12px;
-                    z-index: 2;
-                    margin: 0;
-                }
+        .wishlist-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e5e5;
+            border-radius: 50%;
+            background: #fff;
+            color: #777;
+            font-size: 25px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s, transform 0.2s;
+        }
 
-                .wishlist-button {
-                    width: 40px;
-                    height: 40px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 1px solid #e5e5e5;
-                    border-radius: 50%;
-                    background: #fff;
-                    color: #777;
-                    font-size: 25px;
-                    line-height: 1;
-                    cursor: pointer;
-                    transition: color 0.2s, background 0.2s, transform 0.2s;
-                }
+        .wishlist-button:hover {
+            transform: scale(1.08);
+            background: #fff0f2;
+        }
 
-                .wishlist-button:hover {
-                    transform: scale(1.08);
-                    background: #fff0f2;
-                }
+        .wishlist-button.is-favorite {
+            color: #e53950;
+            background: #fff0f2;
+        }
 
-                .wishlist-button.is-favorite {
-                    color: #e53950;
-                    background: #fff0f2;
-                }
+        .wishlist-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
 
-                .wishlist-button:disabled {
-                    opacity: 0.6;
-                    cursor: wait;
-                }
+        .product-image {
+            height: 300px;
+            background: #f3f3f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+        }
 
-                .product-image {
-                    height: 300px;
-                    background: #f3f3f3;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #aaa;
-                }
+        .product-info {
+            padding: 18px;
+        }
 
-                .product-image img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
+        .product-name {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
 
-                .product-info {
-                    padding: 18px;
-                }
+        .product-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
 
-                .product-name {
-                    font-size: 18px;
-                    margin-bottom: 10px;
-                }
+        .product-price {
+            margin-bottom: 15px;
+        }
 
-                .product-description {
-                    color: #666;
-                    margin-bottom: 15px;
-                }
+        .product-button {
+            width: 100%;
+            min-height: 44px;
+            border: 1px solid #0099ff;
+            border-radius: 6px;
+            background: white;
+            color: #0088dd;
+            cursor: pointer;
+        }
 
-                .product-price {
-                    margin-bottom: 15px;
-                }
+        /* PAGINATION */
+        .pagination {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-                .product-button {
-                    width: 100%;
-                    min-height: 44px;
-                    border: 1px solid #0099ff;
-                    border-radius: 6px;
-                    background: white;
-                    color: #0088dd;
-                    cursor: pointer;
-                }
+        .pagination a,
+        .pagination span {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            background: white;
+            color: #333;
+        }
 
-                /* PAGINATION */
-                .pagination {
-                    margin-top: 40px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 10px;
-                    flex-wrap: wrap;
-                }
+        .pagination .current {
+            background: #0088dd;
+            color: white;
+            border-color: #0088dd;
+        }
 
-                .pagination a,
-                .pagination span {
-                    padding: 10px 16px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    text-decoration: none;
-                    background: white;
-                    color: #333;
-                }
+        .pagination .disabled {
+            color: #aaa;
+            cursor: not-allowed;
+        }
 
-                .pagination .current {
-                    background: #0088dd;
-                    color: white;
-                    border-color: #0088dd;
-                }
+        @media (max-width: 1000px) {
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
 
-                .pagination .disabled {
-                    color: #aaa;
-                    cursor: not-allowed;
-                }
+        @media (max-width: 600px) {
+            body {
+                margin: 20px;
+            }
 
-                @media (max-width: 1000px) {
-                    .product-grid {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
-                }
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
 
-                @media (max-width: 600px) {
-                    body {
-                        margin: 20px;
-                    }
+            .toolbar input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
 
-                    .product-grid {
-                        grid-template-columns: 1fr;
-                    }
+<body>
 
-                    .toolbar input {
-                        width: 100%;
-                    }
-                }
-            </style>
-        </head>
+<h1>Tất cả sản phẩm</h1>
 
-        <body>
+<!-- SEARCH / FILTER / SORT -->
+<form method="get"
+      action="${pageContext.request.contextPath}/products"
+      class="toolbar">
 
-            <h1>Tất cả sản phẩm</h1>
+    <input
+        type="text"
+        name="search"
+        placeholder="Tìm kiếm sản phẩm..."
+        value="<c:out value='${search}'/>"
+    />
 
-            <!-- SEARCH / FILTER / SORT -->
-            <form method="get" action="${pageContext.request.contextPath}/products" class="toolbar">
+    <select name="categoryId">
+        <option value="">Tất cả danh mục</option>
 
-                <input type="text" name="search" placeholder="Tìm kiếm sản phẩm..."
-                    value="<c:out value='${search}'/>" />
+        <option value="1"
+            <c:if test="${categoryId != null && categoryId == 1}">selected</c:if>>
+            Áo
+        </option>
 
-                <select name="categoryId">
-                    <option value="">Tất cả danh mục</option>
+        <option value="2"
+            <c:if test="${categoryId != null && categoryId == 2}">selected</c:if>>
+            Quần
+        </option>
 
-                    <option value="1" <c:if test="${categoryId != null && categoryId == 1}">selected</c:if>>
-                        Áo
-                    </option>
+        <option value="3"
+            <c:if test="${categoryId != null && categoryId == 3}">selected</c:if>>
+            Áo khoác
+        </option>
 
-                    <option value="2" <c:if test="${categoryId != null && categoryId == 2}">selected</c:if>>
-                        Quần
-                    </option>
+        <option value="4"
+            <c:if test="${categoryId != null && categoryId == 4}">selected</c:if>>
+            Phụ kiện
+        </option>
+    </select>
 
-                    <option value="3" <c:if test="${categoryId != null && categoryId == 3}">selected</c:if>>
-                        Áo khoác
-                    </option>
+    <select name="sort">
+        <option value=""
+            <c:if test="${empty sort}">selected</c:if>>
+            Sắp xếp
+        </option>
 
-                    <option value="4" <c:if test="${categoryId != null && categoryId == 4}">selected</c:if>>
-                        Phụ kiện
-                    </option>
-                </select>
+        <option value="asc"
+            <c:if test="${sort == 'asc'}">selected</c:if>>
+            Giá thấp → cao
+        </option>
 
-                <select name="sort">
-                    <option value="" <c:if test="${empty sort}">selected</c:if>>
-                        Sắp xếp
-                    </option>
+        <option value="desc"
+            <c:if test="${sort == 'desc'}">selected</c:if>>
+            Giá cao → thấp
+        </option>
+    </select>
 
-                    <option value="asc" <c:if test="${sort == 'asc'}">selected</c:if>>
-                        Giá thấp → cao
-                    </option>
+    <button type="submit">Tìm kiếm</button>
+</form>
 
-                    <option value="desc" <c:if test="${sort == 'desc'}">selected</c:if>>
-                        Giá cao → thấp
-                    </option>
-                </select>
+<!-- PRODUCT GRID -->
+<div class="product-grid">
 
-                <button type="submit">Tìm kiếm</button>
-            </form>
+    <c:forEach var="product" items="${products}">
 
-            <!-- PRODUCT GRID -->
-            <div class="product-grid">
+        <div class="product-card">
 
-                <c:forEach var="product" items="${products}">
-
-                    <div class="product-card">
-
-                        <!-- IMAGE -->
-                        <div class="product-image">
-                            <c:choose>
-                                <c:when test="${not empty firstImageUrls[product.id]}">
-                                    <img src="<c:out value='${firstImageUrls[product.id]}'/>"
-                                        alt="<c:out value='${product.name}'/>">
-                                </c:when>
-                                <c:otherwise>
-                                    Ảnh sản phẩm
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
-                        <!-- WISHLIST -->
-                        <form method="post" action="${pageContext.request.contextPath}/wishlist/toggle"
-                            class="wishlist-form" data-wishlist-form>
-
-                            <input type="hidden" name="action"
-                                value="${favoriteProductIds.contains(product.id) ? 'remove' : 'add'}">
-                            <input type="hidden" name="productId" value="${product.id}">
-
-                            <button type="submit"
-                                class="wishlist-button ${favoriteProductIds.contains(product.id) ? 'is-favorite' : ''}"
-                                aria-pressed="${favoriteProductIds.contains(product.id)}">
-                                ${favoriteProductIds.contains(product.id) ? '♥' : '♡'}
-                            </button>
-                        </form>
-
-                        <!-- PRODUCT INFO -->
-                        <div class="product-info">
-
-                            <h3 class="product-name">
-                                <c:out value="${product.name}" />
-                            </h3>
-
-                            <p class="product-description">
-                                <c:out value="${product.description}" />
-                            </p>
-
-                            <p class="product-price">
-                                <c:choose>
-                                    <c:when test="${minVariantPrices[product.id] != null}">
-                                        Từ
-                                        <c:out value="${minVariantPrices[product.id]}" /> VNĐ
-                                    </c:when>
-
-                                    <c:otherwise>
-                                        <c:out value="${product.price}" /> VNĐ
-                                    </c:otherwise>
-                                </c:choose>
-                            </p>
-
-                            <!-- Giữ nguyên nút giỏ hàng hiện tại -->
-                            <button type="button" class="product-button">
-                                + Thêm vào giỏ
-                            </button>
-                        </div>
-                    </div>
-
-                </c:forEach>
-
+            <!-- IMAGE -->
+            <div class="product-image">
+                Ảnh sản phẩm
             </div>
 
-            <!-- NO PRODUCTS -->
-            <c:if test="${empty products}">
-                <p>Không tìm thấy sản phẩm.</p>
-            </c:if>
+            <!-- WISHLIST -->
+            <form method="post"
+			      action="${pageContext.request.contextPath}/wishlist/toggle"
+			      class="wishlist-form"
+			      data-wishlist-form>
+			
+			    <input type="hidden" name="action" value="${favoriteProductIds.contains(product.id) ? 'remove' : 'add'}">
+			    <input type="hidden" name="productId" value="${product.id}">
+			
+			    <button type="submit"
+			            class="wishlist-button ${favoriteProductIds.contains(product.id) ? 'is-favorite' : ''}"
+			            aria-pressed="${favoriteProductIds.contains(product.id)}">
+			        ${favoriteProductIds.contains(product.id) ? '♥' : '♡'}
+			    </button>
+			</form>
 
-            <!-- PAGINATION -->
-            <c:if test="${totalPages > 1}">
+            <!-- PRODUCT INFO -->
+            <div class="product-info">
 
-                <div class="pagination">
+                <h3 class="product-name">
+                    <c:out value="${product.name}"/>
+                </h3>
 
-                    <!-- PREVIOUS -->
+                <p class="product-description">
+                    <c:out value="${product.description}"/>
+                </p>
+
+                <p class="product-price">
                     <c:choose>
-                        <c:when test="${currentPage > 1}">
-                            <c:url var="previousUrl" value="/products">
-                                <c:param name="page" value="${currentPage - 1}" />
-                                <c:param name="search" value="${search}" />
-                                <c:param name="categoryId" value="${categoryId}" />
-                                <c:param name="sort" value="${sort}" />
-                            </c:url>
-
-                            <a href="${pageContext.request.contextPath}${previousUrl}">
-                                ← Trang trước
-                            </a>
+                        <c:when test="${minVariantPrices[product.id] != null}">
+                            Từ <c:out value="${minVariantPrices[product.id]}"/> VNĐ
                         </c:when>
 
                         <c:otherwise>
-                            <span class="disabled">← Trang trước</span>
+                            <c:out value="${product.price}"/> VNĐ
                         </c:otherwise>
                     </c:choose>
+                </p>
 
-                    <!-- PAGE NUMBER -->
-                    <span class="current">
-                        Trang
-                        <c:out value="${currentPage}" />
-                        /
-                        <c:out value="${totalPages}" />
-                    </span>
+                <!-- Giữ nguyên nút giỏ hàng hiện tại -->
+                <button type="button" class="product-button">
+                    + Thêm vào giỏ
+                </button>
+            </div>
+        </div>
 
-                    <!-- NEXT -->
-                    <c:choose>
-                        <c:when test="${currentPage < totalPages}">
-                            <c:url var="nextUrl" value="/products">
-                                <c:param name="page" value="${currentPage + 1}" />
-                                <c:param name="search" value="${search}" />
-                                <c:param name="categoryId" value="${categoryId}" />
-                                <c:param name="sort" value="${sort}" />
-                            </c:url>
+    </c:forEach>
 
-                            <a href="${pageContext.request.contextPath}${nextUrl}">
-                                Trang sau →
-                            </a>
-                        </c:when>
+</div>
 
-                        <c:otherwise>
-                            <span class="disabled">Trang sau →</span>
-                        </c:otherwise>
-                    </c:choose>
+<!-- NO PRODUCTS -->
+<c:if test="${empty products}">
+    <p>Không tìm thấy sản phẩm.</p>
+</c:if>
 
-                </div>
+<!-- PAGINATION -->
+<c:if test="${totalPages > 1}">
 
-            </c:if>
+    <div class="pagination">
 
-            <!-- WISHLIST JAVASCRIPT -->
-            <script>
+        <!-- PREVIOUS -->
+        <c:choose>
+            <c:when test="${currentPage > 1}">
+                <c:url var="previousUrl" value="/products">
+                    <c:param name="page" value="${currentPage - 1}"/>
+                    <c:param name="search" value="${search}"/>
+                    <c:param name="categoryId" value="${categoryId}"/>
+                    <c:param name="sort" value="${sort}"/>
+                </c:url>
 
-                document.querySelectorAll("[data-wishlist-form]").forEach(form => {
-                    const button = form.querySelector(".wishlist-button");
-                    const actionInput = form.querySelector('[name="action"]');
-                    const productIdInput = form.querySelector('[name="productId"]');
+                <a href="${pageContext.request.contextPath}${previousUrl}">
+                    ← Trang trước
+                </a>
+            </c:when>
 
-                    form.addEventListener("submit", async event => {
-                        event.preventDefault(); // Ngăn trình duyệt chuyển trang
+            <c:otherwise>
+                <span class="disabled">← Trang trước</span>
+            </c:otherwise>
+        </c:choose>
 
-                        if (button.disabled) return;
+        <!-- PAGE NUMBER -->
+        <span class="current">
+            Trang <c:out value="${currentPage}"/>
+            /
+            <c:out value="${totalPages}"/>
+        </span>
 
-                        const wasFavorite = button.classList.contains("is-favorite");
-                        actionInput.value = wasFavorite ? "remove" : "add";
+        <!-- NEXT -->
+        <c:choose>
+            <c:when test="${currentPage < totalPages}">
+                <c:url var="nextUrl" value="/products">
+                    <c:param name="page" value="${currentPage + 1}"/>
+                    <c:param name="search" value="${search}"/>
+                    <c:param name="categoryId" value="${categoryId}"/>
+                    <c:param name="sort" value="${sort}"/>
+                </c:url>
 
-                        const formData = new URLSearchParams({
-                            action: actionInput.value,
-                            productId: productIdInput.value
-                        });
+                <a href="${pageContext.request.contextPath}${nextUrl}">
+                    Trang sau →
+                </a>
+            </c:when>
 
-                        const wishlistUrl = form.getAttribute("action");
+            <c:otherwise>
+                <span class="disabled">Trang sau →</span>
+            </c:otherwise>
+        </c:choose>
 
-                        button.disabled = true;
-                        console.log("URL:", wishlistUrl);
-                        console.log("action:", actionInput.value);
-                        console.log("productId:", productIdInput.value);
-                        console.log("Payload:", formData.toString());
-                        try {
-                            const response = await fetch(wishlistUrl, {
-                                method: "POST",
-                                body: formData,
-                                headers: {
-                                    "X-Requested-With": "XMLHttpRequest",
-                                    "Content-Type": "application/x-www-form-urlencoded"
-                                }
-                            });
+    </div>
 
-                            if (!response.ok || response.redirected) {
-                                throw new Error("HTTP " + response.status);
-                            }
+</c:if>
 
-                            const isFavorite = !wasFavorite;
+<!-- WISHLIST JAVASCRIPT -->
+<script>
 
-                            button.classList.toggle("is-favorite", isFavorite);
-                            button.textContent = isFavorite ? "♥" : "♡";
-                            button.setAttribute("aria-pressed", String(isFavorite));
-                            button.setAttribute(
-                                "aria-label",
-                                isFavorite ? "Bỏ yêu thích" : "Thêm vào yêu thích"
-                            );
-                            button.title = isFavorite
-                                ? "Bỏ yêu thích"
-                                : "Thêm vào yêu thích";
+document.querySelectorAll("[data-wishlist-form]").forEach(form => {
+    const button = form.querySelector(".wishlist-button");
+    const actionInput = form.querySelector('[name="action"]');
+    const productIdInput = form.querySelector('[name="productId"]');
 
-                        } catch (error) {
-                            console.error("Wishlist error:", error);
-                            alert("Không thể cập nhật yêu thích. Vui lòng thử lại.");
-                        } finally {
-                            button.disabled = false;
-                        }
-                    });
-                });
+    form.addEventListener("submit", async event => {
+        event.preventDefault(); // Ngăn trình duyệt chuyển trang
 
-            </script>
+        if (button.disabled) return;
 
-        </body>
+        const wasFavorite = button.classList.contains("is-favorite");
+        actionInput.value = wasFavorite ? "remove" : "add";
 
-        </html>
+        const formData = new URLSearchParams({
+            action: actionInput.value,
+            productId: productIdInput.value
+        });
+
+        const wishlistUrl = form.getAttribute("action");
+
+        button.disabled = true;
+        console.log("URL:", wishlistUrl);
+        console.log("action:", actionInput.value);
+        console.log("productId:", productIdInput.value);
+        console.log("Payload:", formData.toString());
+        try {
+        	const response = await fetch(wishlistUrl, {
+        	    method: "POST",
+        	    body: formData,
+        	    headers: {
+        	        "X-Requested-With": "XMLHttpRequest",
+        	        "Content-Type": "application/x-www-form-urlencoded"
+        	    }
+        	});
+
+            if (!response.ok || response.redirected) {
+                throw new Error("HTTP " + response.status);
+            }
+
+            const isFavorite = !wasFavorite;
+
+            button.classList.toggle("is-favorite", isFavorite);
+            button.textContent = isFavorite ? "♥" : "♡";
+            button.setAttribute("aria-pressed", String(isFavorite));
+            button.setAttribute(
+                "aria-label",
+                isFavorite ? "Bỏ yêu thích" : "Thêm vào yêu thích"
+            );
+            button.title = isFavorite
+                ? "Bỏ yêu thích"
+                : "Thêm vào yêu thích";
+
+        } catch (error) {
+            console.error("Wishlist error:", error);
+            alert("Không thể cập nhật yêu thích. Vui lòng thử lại.");
+        } finally {
+            button.disabled = false;
+        }
+    });
+});
+
+</script>
+
+</body>
+</html>

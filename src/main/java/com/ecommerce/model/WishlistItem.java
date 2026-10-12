@@ -5,8 +5,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wishlist_items", uniqueConstraints = { @UniqueConstraint(name = "uq_wishlist_user_product", columnNames = { "user_id",
-        "product_id" }) })
+@Table(
+    name = "wishlist_items",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uq_wishlist_user_product",
+            columnNames = {"user_id", "product_id"}
+        )
+    }
+)
 public class WishlistItem {
 
     @Id
@@ -23,7 +30,8 @@ public class WishlistItem {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public WishlistItem() {}
+    public WishlistItem() {
+    }
 
     @PrePersist
     protected void onCreate() {
