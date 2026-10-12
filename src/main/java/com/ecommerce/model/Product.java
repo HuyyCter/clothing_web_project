@@ -1,9 +1,9 @@
 package com.ecommerce.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
 @Table(name = "products")
 public class Product {
@@ -22,6 +22,8 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(name = "price", precision = 12, scale = 2)
+    private BigDecimal price;
     // 1 Product - N ProductVariant (Association)
     @OneToMany(mappedBy = "product")
     private List<ProductVariant> variants = new ArrayList<>();
@@ -33,10 +35,16 @@ public class Product {
     public Product() {
     }
 
-    public Product(String name, String description, Category category) {
+    public Product(
+            String name,
+            String description,
+            Category category,
+            BigDecimal price) {
+
         this.name = name;
         this.description = description;
         this.category = category;
+        this.price = price;
     }
 
     // ==========================================
@@ -89,7 +97,13 @@ public class Product {
     public void setImages(List<ProductImage> images) {
         this.images = images;
     }
-    
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
     // ==========================================
     // METHODS
     // ==========================================

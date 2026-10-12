@@ -32,7 +32,7 @@
                 </form>
 
                 <nav class="navbar__actions">
-                    <a href="/wishlist" class="navbar__icon-btn" title="Wishlist">
+                    <a href="/clothing_web_project/wishlist/toggle" class="navbar__icon-btn" title="Wishlist">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path
@@ -64,11 +64,11 @@
         <!-- CATEGORY NAV -->
         <nav class="cat-nav">
             <div class="cat-nav__inner">
-                <a href="/products" class="cat-nav__item cat-nav__item--active">Tất cả</a>
-                <a href="/products?categoryId=1" class="cat-nav__item">Áo</a>
-                <a href="/products?categoryId=2" class="cat-nav__item">Quần</a>
-                <a href="/products?categoryId=3" class="cat-nav__item">Áo khoác</a>
-                <a href="/products?categoryId=4" class="cat-nav__item">Phụ kiện</a>
+                <a href="${pageContext.request.contextPath}/products" class="cat-nav__item cat-nav__item--active">Tất cả</a>
+                <a href="${pageContext.request.contextPath}/products?categoryId=1" class="cat-nav__item">Áo</a>
+                <a href="${pageContext.request.contextPath}/products?categoryId=2" class="cat-nav__item">Quần</a>
+                <a href="${pageContext.request.contextPath}/products?categoryId=3" class="cat-nav__item">Áo khoác</a>
+                <a href="${pageContext.request.contextPath}/products?categoryId=4" class="cat-nav__item">Phụ kiện</a>
             </div>
         </nav>
 
@@ -103,7 +103,7 @@
             <div class="section__inner">
                 <div class="section__head">
                     <h2 class="section__title">Sản phẩm nổi bật</h2>
-                    <a href="/products" class="section__link">Xem tất cả →</a>
+                    <a href="${pageContext.request.contextPath}/products" class="section__link">Xem tất cả →</a>
                 </div>
                 <div class="product-grid">
                     <article class="product-card">

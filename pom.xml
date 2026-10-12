@@ -57,7 +57,7 @@
     <dependency>
         <groupId>org.glassfish.web</groupId>
         <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-        <version>${jstl.impl.version}</version>
+        <version>3.0.1</version>
     </dependency>
     <!-- ===== JPA / Hibernate ===== -->
     <dependency>
@@ -121,6 +121,7 @@
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
     </dependency>
+    
   </dependencies>
 
   <build>
