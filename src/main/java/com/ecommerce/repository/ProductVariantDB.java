@@ -101,4 +101,10 @@ public class ProductVariantDB {
         query.setParameter("status", status);
         return query.getSingleResult();
     }
+
+    // ==================== Phúc Nguyên ====================
+    public static List<ProductVariant> findAll(EntityManager em) {
+        String queryString = "SELECT pv FROM ProductVariant pv ORDER BY pv.id DESC";
+        return em.createQuery(queryString, ProductVariant.class).getResultList();
+    }
 }
