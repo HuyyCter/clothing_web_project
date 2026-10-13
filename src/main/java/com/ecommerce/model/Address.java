@@ -16,6 +16,12 @@ public class Address {
 	@JoinColumn(name = "user_id")
 	private User user;
 	
+	@Column(name = "recipient_name")
+	private String recipientName;
+
+	@Column(name = "phone")
+	private String phone;
+
 	@Column(name = "street")
     private String street;
 
@@ -35,6 +41,17 @@ public class Address {
     private LocalDateTime createdAt;
 
     public Address() {
+    }
+
+    public Address(User user, String recipientName, String phone, String street, String ward, String district, String city, boolean isDefault) {
+        this.user = user;
+        this.recipientName = recipientName;
+        this.phone = phone;
+        this.street = street;
+        this.ward = ward;
+        this.district = district;
+        this.city = city;
+        this.isDefault = isDefault;
     }
 
     public Address(User user, String street, String ward, String district, String city, boolean isDefault) {
@@ -70,6 +87,22 @@ public class Address {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getStreet() {

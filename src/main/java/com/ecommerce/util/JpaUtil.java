@@ -4,6 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class JpaUtil {
 	private static final EntityManagerFactory ENTITY_MANAGER_FACTORY =
             Persistence.createEntityManagerFactory("ClothingWebPU");
@@ -18,3 +21,4 @@ public class JpaUtil {
         }
     }
 }
+

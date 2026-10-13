@@ -1,33 +1,39 @@
 package com.ecommerce.dto;
 
-import java.math.BigDecimal;
+import java.util.*;
+import com.ecommerce.model.Product;
 
 public class ProductDTO {
-
     private int id;
     private String name;
     private String description;
+    private int categoryId;
     private String categoryName;
-    private String primaryImageUrl;
-    private BigDecimal minPrice;
+    private boolean isActive;
+    private List<ProductVariantDTO> variants = new ArrayList<>();
+    private List<ProductImageDTO> images = new ArrayList<>();
 
-    public ProductDTO() {
-    }
+    public ProductDTO() {}
 
-    public ProductDTO(
-            int id,
-            String name,
-            String description,
-            String categoryName,
-            String primaryImageUrl,
-            BigDecimal minPrice) {
+    public static ProductDTO fromEntity(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.id = product.getId();
+        dto.name = product.getName();
+        dto.description = product.getDescription();
+        dto.isActive = product.isActive();
+        if (product.getCategory() != null) {
+            dto.categoryId = product.getCategory().getId();
+            dto.categoryName = product.getCategory().getName();
+        }
 
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.categoryName = categoryName;
-        this.primaryImageUrl = primaryImageUrl;
-        this.minPrice = minPrice;
+        // if (product.getVariants() != null) {
+        // dto.variants = product.getVariants().stream().map(ProductVariantDTO::fromEntity).toList();
+        // }
+
+        // if (product.getImages() != null) {
+        // dto.images = product.getImages().stream().map(ProductImageDTO::fromEntity).toList();
+        // }
+        return dto;
     }
 
     public int getId() {
@@ -54,6 +60,14 @@ public class ProductDTO {
         this.description = description;
     }
 
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
@@ -62,19 +76,31 @@ public class ProductDTO {
         this.categoryName = categoryName;
     }
 
-    public String getPrimaryImageUrl() {
-        return primaryImageUrl;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setPrimaryImageUrl(String primaryImageUrl) {
-        this.primaryImageUrl = primaryImageUrl;
+    public boolean getIsActive() {
+        return isActive;
     }
 
-    public BigDecimal getMinPrice() {
-        return minPrice;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
-    public void setMinPrice(BigDecimal minPrice) {
-        this.minPrice = minPrice;
+    public List<ProductVariantDTO> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(List<ProductVariantDTO> variants) {
+        this.variants = variants;
+    }
+
+    public List<ProductImageDTO> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImageDTO> images) {
+        this.images = images;
     }
 }
