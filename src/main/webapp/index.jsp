@@ -1,4 +1,5 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
     <!DOCTYPE html>
     <html lang="vi">
 
@@ -49,13 +50,13 @@
                         <span class="navbar__cart-badge">2</span>
                     </a>
                     <div class="navbar__divider"></div>
-                    <a href="/profile" class="navbar__user-link">
+                    <a href="${pageContext.request.contextPath}/login" class="navbar__user-link" id="navUserLink" title="Tài khoản">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        HuyCter
+                        <span id="logoText"><c:choose><c:when test="${not empty sessionScope.user}"><c:out value="${sessionScope.user.fullName}" /></c:when><c:when test="${not empty sessionScope.logoName}"><c:out value="${sessionScope.logoName}" /></c:when><c:otherwise>HuyCter</c:otherwise></c:choose></span>
                     </a>
                 </nav>
             </div>
@@ -493,6 +494,19 @@
             <div class="footer__bottom">© 2026 Fashion Shop. All rights reserved.</div>
         </footer>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var navUserLink = document.getElementById('navUserLink');
+                if (navUserLink) {
+                    navUserLink.addEventListener('click', function () {
+                        var logoText = document.getElementById('logoText');
+                        if (logoText) {
+                            logoText.textContent = 'Guest';
+                        }
+                    });
+                }
+            });
+        </script>
     </body>
 
     </html>

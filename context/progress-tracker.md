@@ -18,6 +18,29 @@ change.
 
 ## Completed
 
+- [x] `src/main/webapp/index.jsp` — Giao diện trang chủ cửa hàng (Hero banner, danh mục nổi bật, sản phẩm mới, tính năng).
+- [x] `src/main/webapp/assets/css/admin.css` & `common.css` — Hệ thống design token và CSS thuần quản trị viên.
+- [x] `src/main/webapp/WEB-INF/views/admin/dashboard.jsp` — Tổng quan thống kê doanh thu, đơn hàng, khách hàng, biểu đồ và bảng hoạt động.
+- [x] `src/main/webapp/WEB-INF/views/admin/category-list.jsp` — Danh sách quản lý danh mục cha/con.
+- [x] `src/main/webapp/WEB-INF/views/admin/category-form.jsp` — Form thêm/sửa danh mục sản phẩm (hỗ trợ phân cấp 2 tầng).
+- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` — Danh sách sản phẩm với bộ lọc, trạng thái và hiển thị biến thể.
+- [x] `src/main/webapp/WEB-INF/views/admin/product-form.jsp` — Form thêm/sửa sản phẩm kèm quản lý biến thể (Size/Màu) và liên kết ảnh Cloudinary.
+- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` — Danh sách đơn hàng với bộ lọc trạng thái và phân trang.
+- [x] `src/main/webapp/WEB-INF/views/admin/order-detail.jsp` — Chi tiết đơn hàng, snapshot thông tin giao hàng, cập nhật state machine trạng thái đơn.
+- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` — Danh sách quản lý mã giảm giá (voucher).
+- [x] `src/main/webapp/WEB-INF/views/admin/voucher-form.jsp` — Form thêm/sửa voucher (% giảm, đơn tối thiểu, giảm tối đa, hạn dùng, giới hạn lượt dùng).
+- [x] `src/main/java/com/ecommerce/model/Address.java` — Bổ sung `recipientName` và `phone` vào Address entity khớp đặc tả UML và snapshot đơn hàng.
+- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt (không lưu plaintext).
+- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` — Repository truy vấn User (findByEmail, findByPhone, existsByEmail/existsByPhone, save, delete, phân trang).
+- [x] `src/test/java/com/ecommerce/util/PasswordUtilTest.java` — Unit test cho thuật toán mã hóa mật khẩu.
+- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet điều hướng và xử lý xác thực Đăng nhập sử dụng thuần lower-level Jakarta Servlet API (`HttpServlet`, `HttpSession`, `RequestDispatcher`), thiết lập tên logo/guest vào session và forward đến `login.jsp`.
+- [x] `src/main/webapp/index.jsp` — Điều hướng liên kết tài khoản ở menu sang `/login`, cập nhật hiển thị động tên logo sang Guest qua session/Servlet API.
+- [x] `src/main/webapp/login.jsp` — Cập nhật form action theo contextPath, hiển thị thông báo lỗi và trạng thái người dùng/Guest.
+
+## In Progress
+
+- Module HAS: Hoàn thiện tầng Service & Controller cho Authentication (Login, Register, Logout).
+
 - `model/Category.java` (id, name, description, slug) — khớp class
   diagram, danh mục phẳng, không có parent. Có business method
   `create`, `update`, `delete`, `getById`, `getAll` (Model tự mở
