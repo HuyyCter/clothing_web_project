@@ -3,8 +3,8 @@ package com.ecommerce.util;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Utility hỗ trợ băm (hash) và kiểm tra mật khẩu sử dụng jBCrypt.
- * Đảm bảo mật khẩu không bao giờ được lưu trữ dưới dạng plain text.
+ * Utility hỗ trợ băm (hash) và kiểm tra mật khẩu sử dụng jBCrypt. Đảm bảo mật khẩu không bao giờ
+ * được lưu trữ dưới dạng plain text.
  */
 public class PasswordUtil {
 
@@ -31,7 +31,7 @@ public class PasswordUtil {
     /**
      * Kiểm tra mật khẩu gốc có khớp với chuỗi hash đã lưu hay không.
      *
-     * @param plainPassword  mật khẩu do người dùng nhập vào
+     * @param plainPassword mật khẩu do người dùng nhập vào
      * @param hashedPassword chuỗi hash đã lưu trong database
      * @return true nếu mật khẩu chính xác, ngược lại false
      */

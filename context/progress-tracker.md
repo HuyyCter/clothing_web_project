@@ -5,8 +5,8 @@ change.
 
 ## Current Phase
 
-- Thiết kế context files (chưa code, chưa chia unit, chưa viết
-  spec feature).
+- Code phần Admin: unit "CRUD Category" — đã xong repository, Model,
+  Servlet, JSP; chưa test thủ công end-to-end trên Tomcat.
 
 ## Current Goal
 
@@ -18,28 +18,26 @@ change.
 
 ## Completed
 
+- `model/Category.java` (id, name, description, slug) — khớp class diagram, danh mục phẳng. Có business method create, update, delete, getById, getAll.
+- `dto/CategoryDTO.java`, `validator/CategoryValidator.java`, `controller/AdminCategoryServlet.java`.
+- `views/admin/category-list.jsp`, `category-form.jsp` — nối với Servlet bằng JSTL.
+- `util/SlugUtil.java`, `repository/CategoryDB.java`.
 - [x] `src/main/webapp/index.jsp` — Giao diện trang chủ cửa hàng (Hero banner, danh mục nổi bật, sản phẩm mới, tính năng).
 - [x] `src/main/webapp/assets/css/admin.css` & `common.css` — Hệ thống design token và CSS thuần quản trị viên.
 - [x] `src/main/webapp/WEB-INF/views/admin/dashboard.jsp` — Tổng quan thống kê doanh thu, đơn hàng, khách hàng, biểu đồ và bảng hoạt động.
-- [x] `src/main/webapp/WEB-INF/views/admin/category-list.jsp` — Danh sách quản lý danh mục cha/con.
-- [x] `src/main/webapp/WEB-INF/views/admin/category-form.jsp` — Form thêm/sửa danh mục sản phẩm (hỗ trợ phân cấp 2 tầng).
-- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` — Danh sách sản phẩm với bộ lọc, trạng thái và hiển thị biến thể.
-- [x] `src/main/webapp/WEB-INF/views/admin/product-form.jsp` — Form thêm/sửa sản phẩm kèm quản lý biến thể (Size/Màu) và liên kết ảnh Cloudinary.
-- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` — Danh sách đơn hàng với bộ lọc trạng thái và phân trang.
-- [x] `src/main/webapp/WEB-INF/views/admin/order-detail.jsp` — Chi tiết đơn hàng, snapshot thông tin giao hàng, cập nhật state machine trạng thái đơn.
-- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` — Danh sách quản lý mã giảm giá (voucher).
-- [x] `src/main/webapp/WEB-INF/views/admin/voucher-form.jsp` — Form thêm/sửa voucher (% giảm, đơn tối thiểu, giảm tối đa, hạn dùng, giới hạn lượt dùng).
-- [x] `src/main/java/com/ecommerce/model/Address.java` — Bổ sung `recipientName` và `phone` vào Address entity khớp đặc tả UML và snapshot đơn hàng.
-- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt (không lưu plaintext).
-- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` — Repository truy vấn User (findByEmail, findByPhone, existsByEmail/existsByPhone, save, delete, phân trang).
-- [x] `src/test/java/com/ecommerce/util/PasswordUtilTest.java` — Unit test cho thuật toán mã hóa mật khẩu.
-- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet điều hướng và xử lý xác thực Đăng nhập sử dụng thuần lower-level Jakarta Servlet API (`HttpServlet`, `HttpSession`, `RequestDispatcher`), thiết lập tên logo/guest vào session và forward đến `login.jsp`.
-- [x] `src/main/webapp/index.jsp` — Điều hướng liên kết tài khoản ở menu sang `/login`, cập nhật hiển thị động tên logo sang Guest qua session/Servlet API.
-- [x] `src/main/webapp/login.jsp` — Cập nhật form action theo contextPath, hiển thị thông báo lỗi và trạng thái người dùng/Guest.
+- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` & `product-form.jsp` — Quản lý sản phẩm, biến thể và liên kết ảnh Cloudinary.
+- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` & `order-detail.jsp` — Danh sách và chi tiết đơn hàng.
+- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` & `voucher-form.jsp` — Quản lý voucher.
+- [x] `src/main/java/com/ecommerce/model/Address.java` — Entity Address có recipientName và phone.
+- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt.
+- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` & `UserDB.java` — Quản lý truy vấn User.
+- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
+- [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký.
 
 ## In Progress
 
-- Module HAS: Hoàn thiện tầng Service & Controller cho Authentication (Login, Register, Logout).
+- Hoàn thiện luồng xác thực Customer/Admin và tích hợp với client side.
+- Unit "CRUD Category": còn test thủ công. Rule chặn xóa khi còn sản phẩm chưa làm (đang có TODO trong Category.delete), cần thêm query đếm sản phẩm trong CategoryDB sau khi có entity Product.
 
 ## Next Up
 
@@ -49,12 +47,6 @@ change.
   (chia unit / viết spec feature) — không tự động làm tiếp.
 
 ## Open Questions
-
-- ORM hiện chọn JPA/Hibernate thuần. Có khả năng giảng viên yêu
-  cầu đổi sang JDBC thuần — chưa chốt, cần theo dõi và cập nhật
-  `architecture.md` nếu có thay đổi.
-- Package name Java tạm đặt `com.javaproject.e-commerce-web` — chỉ là
-  gợi ý ban đầu, có thể đổi tên bất kỳ lúc nào trước khi code.
 
 ## Architecture Decisions
 
@@ -74,15 +66,25 @@ change.
 - Đơn hàng thanh toán online (VNPay/MoMo) chỉ được tạo sau khi có
   callback (IPN) xác nhận thành công, trạng thái khởi tạo thẳng
   "Đã xác nhận"; đơn COD tạo ngay với trạng thái "Chờ xác nhận".
-- Danh mục sản phẩm giới hạn tối đa 2 cấp (cha — con), không cho
-  phép lồng cấp thứ 3, để đơn giản hóa truy vấn và UI breadcrumb.
+- Danh mục sản phẩm là danh sách phẳng (áo thun, áo khoác, áo tay
+  dài...), không có cấp cha — con, để đơn giản hóa truy vấn và UI.
+- `CategoryDB` dùng static method theo pattern `UserDAO`, nhận
+  `EntityManager` làm tham số, không mở transaction và không nuốt
+  exception. Model tự mở `EntityManager` + transaction trong từng
+  method (rollback rồi ném lại cho `GlobalExceptionFilter`).
+- Validate field đơn giản làm thủ công (if/else) trong `validator/`,
+  không dùng Bean Validation annotation (vì giảng viên không dạy và
+  khó giải thích khi vấn đáp). Đã đồng bộ `architecture.md` và
+  `code-standards.md`.
+- Sau POST thành công, Servlet `forward` về trang danh sách (theo
+  `code-standards.md`), không `redirect`.
+- Slug category tự sinh từ name qua `SlugUtil` (cả lúc tạo và sửa);
+  trùng slug thì Model ném `BusinessException` trước khi ghi DB.
+- Xóa Category còn sản phẩm: chặn xóa (ném `BusinessException`),
+  sản phẩm không bị xóa theo.
 - Ảnh sản phẩm lưu qua Cloudinary (free tier) thay vì lưu trên ổ
   đĩa server, vì project được host thực tế và cần tránh mất ảnh
   khi redeploy/restart server.
-- Đổi hướng cấu hình DB: hardcode trực tiếp trong persistence.xml
-  (bám theo giáo trình giảng viên) thay vì tách db.properties +
-  AppContextListener đọc runtime. File persistence.xml không commit
-  git, gửi riêng từng thành viên tự điền password.
 
 ## Session Notes
 

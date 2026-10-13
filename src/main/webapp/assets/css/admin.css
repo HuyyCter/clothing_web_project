@@ -519,6 +519,15 @@
     gap: 4px;
 }
 
+.admin-table__actions--stretch {
+    align-items: stretch;
+}
+
+.admin-table__actions--stretch form {
+    display: flex;
+    margin: 0;
+}
+
 /* ---------- Icon Button ---------- */
 .btn-icon {
     display: inline-flex;
