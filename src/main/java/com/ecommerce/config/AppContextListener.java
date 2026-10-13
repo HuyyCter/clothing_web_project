@@ -20,7 +20,7 @@ public class AppContextListener implements ServletContextListener {
         System.out.println("[AppContextListener] Khởi tạo ứng dụng: Kiểm tra kết nối JPA và dữ liệu khởi tạo...");
         EntityManager em = null;
         try {
-            em = JpaUtil.createEntityManager();
+            em = JpaUtil.getEntityManager().createEntityManager();
             em.getTransaction().begin();
 
             UserRepository userRepo = new UserRepository(em);
@@ -73,7 +73,9 @@ public class AppContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("[AppContextListener] Giải phóng tài nguyên JpaUtil...");
         try {
-            JpaUtil.shutdown();
+            if (JpaUtil.getEntityManager() != null && JpaUtil.getEntityManager().isOpen()) {
+                JpaUtil.getEntityManager().close();
+            }
         } catch (Throwable t) {
             System.err.println("[AppContextListener] Lỗi khi giải phóng JpaUtil: " + t.getMessage());
         }
