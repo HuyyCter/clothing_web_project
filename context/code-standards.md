@@ -36,8 +36,8 @@
 - 1 Servlet phụ trách 1 nhóm chức năng liên quan (vd `ProductServlet`
   xử lý cả list và detail sản phẩm), không tách vụn thành nhiều
   Servlet cho từng action nhỏ.
-- Servlet chỉ làm: đọc request parameter → validate cơ bản (Bean
-  Validation trên DTO) → gọi business method trên Model tương ứng
+- Servlet chỉ làm: đọc request parameter → validate cơ bản (gọi class
+  trong `validator/`) → gọi business method trên Model tương ứng
   → set attribute vào request → `forward()` sang JSP. Không tự
   query DB, không tự mở transaction (transaction do Model quản lý).
 - Không dùng `redirect` để chuyển trang sau khi submit form thành
@@ -63,10 +63,11 @@
 ## Validation
 
 - Field đơn giản (bắt buộc nhập, định dạng email, độ dài chuỗi,
-  giá trị số dương...) validate bằng Jakarta Bean Validation
-  annotation trên DTO (`@NotBlank`, `@Email`, `@Min`, `@Size`...),
-  chạy qua `Validator` (Hibernate Validator) ngay tại Controller
-  trước khi gọi Model.
+  giá trị số dương...) validate thủ công bằng if/else trong class
+  `validator/` tương ứng (vd `CategoryValidator.validate(dto)`),
+  gọi ngay tại Controller trước khi gọi Model. Hàm trả về thông báo
+  lỗi (`null` nếu hợp lệ); Controller forward lại form kèm lỗi.
+  Không dùng Bean Validation annotation trên DTO.
 - Business rule phức tạp (không cho hủy đơn đã giao, không cho
   mua vượt tồn kho, voucher phải `isActive`, còn trong khoảng
   `startAt`–`endAt`, chưa vượt `usageLimit`, đơn đạt

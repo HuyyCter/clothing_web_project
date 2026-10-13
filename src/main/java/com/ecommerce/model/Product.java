@@ -3,12 +3,22 @@ package com.ecommerce.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.ecommerce.dto.CategoryDTO;
+import com.ecommerce.dto.ProductDTO;
+import com.ecommerce.dto.ProductImageDTO;
+import com.ecommerce.exception.*;
+import com.ecommerce.repository.CategoryDB;
+import com.ecommerce.repository.ProductDB;
+import com.ecommerce.repository.ProductImageDB;
+import com.ecommerce.repository.ProductVariantDB;
+import com.ecommerce.util.JpaUtil;
+import com.ecommerce.validator.ProductValidator;
 
 @Entity
 @Table(name = "products")
 public class Product {
-	
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -17,26 +27,25 @@ public class Product {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    // 1 Product - N ProductVariant (Association)
-    @OneToMany(mappedBy = "product")
-    private List<ProductVariant> variants = new ArrayList<>();
 
     // 1 Product - N ProductImage (Composition)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
-    public Product() {
-    }
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
+
+    public Product() {}
 
     public Product(String name, String description, Category category) {
         this.name = name;
         this.description = description;
         this.category = category;
+        this.isActive = true;
     }
 
     // ==========================================
@@ -74,14 +83,6 @@ public class Product {
         this.category = category;
     }
 
-    public List<ProductVariant> getVariants() {
-        return variants;
-    }
-
-    public void setVariants(List<ProductVariant> variants) {
-        this.variants = variants;
-    }
-
     public List<ProductImage> getImages() {
         return images;
     }
@@ -89,9 +90,179 @@ public class Product {
     public void setImages(List<ProductImage> images) {
         this.images = images;
     }
-    
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     // ==========================================
     // METHODS
     // ==========================================
-    
+    public static ProductDTO create(ProductDTO dto) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        normalizeDTO(dto);
+        String name = dto.getName();
+        String description = dto.getDescription();
+        int categoryId = dto.getCategoryId();
+
+        try {
+            trans.begin();
+
+            if (!CategoryDB.isCategoryIdExists(em, categoryId)) {
+                throw new NotFoundException("Không tìm thấy danh mục có id = " + categoryId);
+            }
+
+            Category category = CategoryDB.findById(em, categoryId);
+            Product product = new Product(name, description, category);
+            ProductDB.insert(em, product);
+
+            trans.commit();
+            return ProductDTO.fromEntity(product);
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static ProductDTO update(int id, ProductDTO dto) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        normalizeDTO(dto);
+        String name = dto.getName();
+        String description = dto.getDescription();
+        int categoryId = dto.getCategoryId();
+
+        try {
+            trans.begin();
+
+            if (!ProductDB.isProductIdExists(em, id)) {
+                throw new NotFoundException("Không tìm thấy sản phẩm có id = " + id);
+            }
+            if (!CategoryDB.isCategoryIdExists(em, categoryId)) {
+                throw new NotFoundException("Không tìm thấy danh mục có id = " + categoryId);
+            }
+
+            Product product = ProductDB.findById(em, id);
+            product.setName(name);
+            product.setDescription(description);
+            product.setCategory(CategoryDB.findById(em, categoryId));
+            ProductDB.update(em, product);
+
+            trans.commit();
+            return ProductDTO.fromEntity(product);
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static void setActive(int id, boolean active) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        try {
+            trans.begin();
+
+            if (!ProductDB.isProductIdExists(em, id)) {
+                throw new NotFoundException("Không tìm thấy sản phẩm có id = " + id);
+            }
+
+            Product product = ProductDB.findById(em, id);
+            product.setActive(active);
+            ProductDB.update(em, product);
+
+            trans.commit();
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    // CHƯA HOÀN THIỆN
+    public static ProductDTO getById(int id) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+
+        try {
+            Product product = ProductDB.findById(em, id);
+            if (product == null) {
+                throw new NotFoundException("Không tìm thấy sản phẩm có id = " + id);
+            }
+
+            ProductDTO dto = ProductDTO.fromEntity(product);
+
+            List<ProductImageDTO> images = new ArrayList<>();
+            for (ProductImage image : ProductImageDB.findByProductId(em, id)) {
+                images.add(ProductImageDTO.fromEntity(image));
+            }
+            dto.setImages(images);
+
+            dto.setVariants(ProductVariant.toTypeDTOs(ProductVariantDB.findByProductId(em, id)));
+            return dto;
+
+        } catch (RuntimeException e) {
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static List<ProductDTO> getAll(int offset, int limit) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+
+        try {
+            List<ProductDTO> products = new ArrayList<>();
+            for (Product product : ProductDB.findAll(em, offset, limit)) {
+                products.add(ProductDTO.fromEntity(product));
+            }
+            return products;
+        } catch (RuntimeException e) {
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static Long countAll() {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+
+        try {
+            return ProductDB.countAll(em);
+        } catch (RuntimeException e) {
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    // ==========================================
+    // PRIVATE HELPERS
+    // ==========================================
+    private static void normalizeDTO(ProductDTO dto) {
+        String error = ProductValidator.validate(dto);
+        if (error != null) {
+            throw new BusinessException(error);
+        }
+
+        String name = dto.getName().trim();
+        String description = dto.getDescription().trim();
+        int categoryId = dto.getCategoryId();
+
+        dto.setName(name);
+        dto.setDescription(description);
+        dto.setCategoryId(categoryId);
+    }
+
 }
