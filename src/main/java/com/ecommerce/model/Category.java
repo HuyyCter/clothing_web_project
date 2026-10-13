@@ -5,6 +5,7 @@ import java.util.List;
 import com.ecommerce.dto.CategoryDTO;
 import com.ecommerce.repository.CategoryDB;
 import com.ecommerce.util.*;
+import com.ecommerce.validator.CategoryValidator;
 import com.ecommerce.exception.*;
 import jakarta.persistence.*;
 
@@ -75,9 +76,10 @@ public class Category {
         EntityManager em = JpaUtil.getEntityManager().createEntityManager();
         EntityTransaction trans = em.getTransaction();
 
-        String name = dto.getName().trim();
+        dto = normalizeDTO(dto);
+        String name = dto.getName();
         String description = dto.getDescription();
-        String slug = buildSlug(name);
+        String slug = dto.getSlug();
 
         try {
             trans.begin();
@@ -102,9 +104,10 @@ public class Category {
         EntityManager em = JpaUtil.getEntityManager().createEntityManager();
         EntityTransaction trans = em.getTransaction();
 
-        String name = dto.getName().trim();
+        dto = normalizeDTO(dto);
+        String name = dto.getName();
         String description = dto.getDescription();
-        String slug = buildSlug(name);
+        String slug = dto.getSlug();
 
         try {
             trans.begin();
@@ -191,11 +194,20 @@ public class Category {
     // ==========================================
     // PRIVATE HELPERS
     // ==========================================
-    private static String buildSlug(String name) {
-        String slug = SlugUtil.toSlug(name);
-        if (slug.isEmpty()) {
-            throw new BusinessException("Tên danh mục không được để trống.");
+    private static CategoryDTO normalizeDTO(CategoryDTO dto) {
+        String error = CategoryValidator.validate(dto);
+        if (error != null) {
+            throw new BusinessException(error);
         }
-        return slug;
+
+        String name = dto.getName().trim();
+        String description = dto.getDescription().trim();
+        String slug = SlugUtil.toSlug(name);
+
+        dto.setName(name);
+        dto.setDescription(description);
+        dto.setSlug(slug);
+
+        return dto;
     }
 }

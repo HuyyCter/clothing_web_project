@@ -10,7 +10,7 @@ public class ProductImageDTO {
 
     public ProductImageDTO() {}
 
-    public ProductImageDTO fromEntity(ProductImage productImage) {
+    public static ProductImageDTO fromEntity(ProductImage productImage) {
         ProductImageDTO dto = new ProductImageDTO();
         dto.id = productImage.getId();
         dto.imageUrl = productImage.getImageUrl();

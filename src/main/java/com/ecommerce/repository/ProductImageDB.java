@@ -28,4 +28,11 @@ public class ProductImageDB {
         query.setParameter("productId", productId);
         return query.getResultList();
     }
+
+    public static boolean isProductImageIdExists(EntityManager em, int id) {
+        String queryString = "SELECT COUNT(pi) FROM ProductImage pi WHERE pi.id = :id";
+        TypedQuery<Long> query = em.createQuery(queryString, Long.class);
+        query.setParameter("id", id);
+        return query.getSingleResult() > 0;
+    }
 }
