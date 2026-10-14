@@ -1,12 +1,19 @@
 package com.ecommerce.model;
 
 import jakarta.persistence.*;
+import java.util.*;
+import com.ecommerce.dto.ProductImageDTO;
+import com.ecommerce.exception.*;
+import com.ecommerce.repository.ProductImageDB;
+import com.ecommerce.repository.ProductDB;
+import com.ecommerce.util.JpaUtil;
+import com.ecommerce.validator.ProductImageValidator;
 
 @Entity
 @Table(name = "product_images")
 public class ProductImage {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
@@ -20,17 +27,12 @@ public class ProductImage {
     @Column(name = "color")
     private String color;
 
-    @Column(name = "is_primary")
-    private boolean isPrimary = false;
+    public ProductImage() {}
 
-    public ProductImage() {
-    }
-
-    public ProductImage(Product product, String imageUrl, String color, boolean isPrimary) {
+    public ProductImage(Product product, String imageUrl, String color) {
         this.product = product;
         this.imageUrl = imageUrl;
         this.color = color;
-        this.isPrimary = isPrimary;
     }
 
     // ==========================================
@@ -68,11 +70,96 @@ public class ProductImage {
         this.color = color;
     }
 
-    public boolean isPrimary() {
-        return isPrimary;
+    // ==========================================
+    // METHODS
+    // ==========================================
+    public static ProductImageDTO add(ProductImageDTO dto) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        normalizeDTO(dto);
+        int productId = dto.getProductId();
+        String imageUrl = dto.getImageUrl();
+        String color = dto.getColor();
+
+        try {
+            trans.begin();
+
+            if (!ProductDB.isProductIdExists(em, productId)) {
+                throw new NotFoundException("Không tìm thấy sản phẩm có id = " + productId);
+            }
+
+            Product product = ProductDB.findById(em, productId);
+            ProductImage productImage = new ProductImage(product, imageUrl, color);
+            ProductImageDB.insert(em, productImage);
+
+            trans.commit();
+            return ProductImageDTO.fromEntity(productImage);
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
-    public void setPrimary(boolean primary) {
-        isPrimary = primary;
+    public static void delete(int id) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        try {
+            trans.begin();
+
+            if (ProductImageDB.isProductImageIdExists(em, id)) {
+                throw new NotFoundException("Không tìm thấy ảnh sản phẩm có id = " + id);
+            }
+            ProductImage productImage = ProductImageDB.findById(em, id);
+            ProductImageDB.delete(em, productImage);
+
+            trans.commit();
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static List<ProductImageDTO> getByProductId(int productId) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+
+        try {
+            List<ProductImageDTO> images = new ArrayList<>();
+            for (ProductImage productImage : ProductImageDB.findByProductId(em, productId)) {
+                images.add(ProductImageDTO.fromEntity(productImage));
+            }
+            return images;
+        } catch (RuntimeException e) {
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    // ==========================================
+    // PRIVATE HELPERS
+    // ==========================================
+    public static String normalizeColor(String color) {
+        return color.trim().replaceAll("\\s+", "-").toLowerCase(Locale.ROOT);
+    }
+
+    private static void normalizeDTO(ProductImageDTO dto) {
+        String error = ProductImageValidator.validate(dto);
+        if (error != null) {
+            throw new BusinessException(error);
+        }
+
+        int productId = dto.getProductId();
+        String imageUrl = dto.getImageUrl().trim();
+        String color = normalizeColor(dto.getColor());
+
+        dto.setProductId(productId);
+        dto.setImageUrl(imageUrl);
+        dto.setColor(color);
     }
 }

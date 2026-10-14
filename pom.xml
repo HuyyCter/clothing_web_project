@@ -30,7 +30,7 @@
     <postgresql.version>42.7.4</postgresql.version>
     <hikaricp.version>6.2.1</hikaricp.version>
     <jbcrypt.version>0.4</jbcrypt.version>
-    <!-- <cloudinary.version>1.39.0</cloudinary.version> -->
+    <cloudinary.version>2.0.0</cloudinary.version>
     <jackson.version>2.18.2</jackson.version>
   </properties>
 
@@ -73,7 +73,7 @@
     <dependency>
     	<groupId>org.hibernate.orm</groupId>
     	<artifactId>hibernate-hikaricp</artifactId>
-    	<version>${hibernate.version}</version>
+    	<version>${hibernate.version}</version> <!-- Thay phiên bản phù hợp với phiên bản Hibernate bạn đang dùng -->
 	</dependency>
     <!-- ===== Database + Connection Pool ===== -->
     <dependency>
@@ -110,11 +110,16 @@
         <version>${jbcrypt.version}</version>
     </dependency>
     <!-- ===== Cloudinary (upload ảnh sản phẩm) ===== -->
-    <!-- <dependency>
+    <dependency>
         <groupId>com.cloudinary</groupId>
         <artifactId>cloudinary-http5</artifactId>
         <version>${cloudinary.version}</version>
-    </dependency> -->
+    </dependency>
+    <dependency>
+        <groupId>com.cloudinary</groupId>
+        <artifactId>cloudinary-taglib</artifactId>
+        <version>${cloudinary.version}</version>
+    </dependency>
     <!-- ===== JSON (dùng cho response AJAX theo chuẩn Problem Detail) ===== -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
