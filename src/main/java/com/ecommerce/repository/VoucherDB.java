@@ -48,4 +48,27 @@ public class VoucherDB {
         query.setParameter("id", id);
         return query.getSingleResult() > 0;
     }
+
+    public static Voucher findByCode(EntityManager em, String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        String queryString = "SELECT v FROM Voucher v WHERE UPPER(v.code) = :code";
+        TypedQuery<Voucher> query = em.createQuery(queryString, Voucher.class);
+        query.setParameter("code", code.trim().toUpperCase());
+        List<Voucher> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    public static Voucher findByCodeWithLock(EntityManager em, String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        String queryString = "SELECT v FROM Voucher v WHERE UPPER(v.code) = :code";
+        TypedQuery<Voucher> query = em.createQuery(queryString, Voucher.class);
+        query.setParameter("code", code.trim().toUpperCase());
+        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        List<Voucher> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
 }

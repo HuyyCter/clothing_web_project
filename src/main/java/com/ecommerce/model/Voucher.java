@@ -1,6 +1,7 @@
 package com.ecommerce.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -314,6 +315,164 @@ public class Voucher {
             throw e;
         } finally {
             em.close();
+        }
+    }
+
+    /**
+     * Lấy thông tin VoucherDTO theo mã code.
+     */
+    public static VoucherDTO getByCode(EntityManager em, String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        Voucher voucher = VoucherDB.findByCode(em, code.trim().toUpperCase());
+        return voucher != null ? VoucherDTO.fromEntity(voucher) : null;
+    }
+
+    public static VoucherDTO getByCode(String code) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        try {
+            return getByCode(em, code);
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ và tính số tiền giảm giá trên một thực thể Voucher.
+     * Áp dụng toàn bộ 5 business rule từ spec.
+     *
+     * @param orderValue Giá trị đơn hàng / subtotal
+     * @return Số tiền được giảm giá (làm tròn số nguyên đồng, RoundingMode.HALF_UP)
+     */
+    public BigDecimal calculateDiscount(BigDecimal orderValue) {
+        if (orderValue == null || orderValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Giá trị đơn hàng không hợp lệ để áp dụng voucher.");
+        }
+
+        // 1. Kiểm tra cờ isActive
+        if (!this.isActive) {
+            throw new BusinessException("Mã voucher '" + this.code + "' hiện đã bị vô hiệu hóa.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // 2. Kiểm tra thời hạn áp dụng (startAt - endAt)
+        if (this.startAt != null && now.isBefore(this.startAt)) {
+            throw new BusinessException("Chưa đến thời gian áp dụng mã voucher '" + this.code + "'.");
+        }
+        if (this.endAt != null && now.isAfter(this.endAt)) {
+            throw new BusinessException("Mã voucher '" + this.code + "' đã hết hạn sử dụng.");
+        }
+
+        // 3. Kiểm tra giới hạn lượt dùng
+        if (this.usageLimit > 0 && this.usedCount >= this.usageLimit) {
+            throw new BusinessException("Mã voucher '" + this.code + "' đã hết lượt sử dụng.");
+        }
+
+        // 4. Kiểm tra đơn hàng tối thiểu
+        BigDecimal minOrder = (this.minOrderAmount != null) ? this.minOrderAmount : BigDecimal.ZERO;
+        if (orderValue.compareTo(minOrder) < 0) {
+            throw new BusinessException("Đơn hàng chưa đạt giá trị tối thiểu " + minOrder.toBigInteger() + "đ để áp dụng voucher này.");
+        }
+
+        // 5. Tính số tiền giảm: orderValue * discountPercent / 100
+        // Tiền VND làm tròn số nguyên RoundingMode.HALF_UP
+        BigDecimal percent = BigDecimal.valueOf(this.discountPercent);
+        BigDecimal discount = orderValue.multiply(percent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+
+        // Giới hạn bởi maxDiscountAmount nếu có
+        if (this.maxDiscountAmount != null && this.maxDiscountAmount.compareTo(BigDecimal.ZERO) > 0) {
+            discount = discount.min(this.maxDiscountAmount);
+        }
+
+        return discount;
+    }
+
+    /**
+     * Kiểm tra toàn bộ điều kiện áp voucher và tính số tiền giảm giá.
+     * Tham gia vào transaction của EntityManager truyền vào (phục vụ Order checkout của Module E hoặc Cart).
+     *
+     * @param em EntityManager từ caller
+     * @param code Mã voucher (không phân biệt hoa/thường)
+     * @param orderValue Tổng tiền hàng (subtotal)
+     * @return Số tiền được giảm giá (làm tròn số nguyên đồng, RoundingMode.HALF_UP)
+     */
+    public static BigDecimal validateAndCalculate(EntityManager em, String code, BigDecimal orderValue) {
+        if (code == null || code.trim().isEmpty()) {
+            throw new BusinessException("Mã voucher không được để trống.");
+        }
+
+        String normalizedCode = code.trim().toUpperCase();
+        Voucher voucher = VoucherDB.findByCode(em, normalizedCode);
+
+        // Kiểm tra tồn tại
+        if (voucher == null) {
+            throw new NotFoundException("Mã voucher '" + normalizedCode + "' không tồn tại.");
+        }
+
+        return voucher.calculateDiscount(orderValue);
+    }
+
+    /**
+     * Overload tự mở EntityManager và transaction cho Controller / UI của Module D.
+     */
+    public static BigDecimal validateAndCalculate(String code, BigDecimal orderValue) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        try {
+            return validateAndCalculate(em, code, orderValue);
+        } finally {
+            em.close();
+        }
+    }
+
+    // ==========================================
+    // OVERLOAD METHODS CHO MODULE E (ORDER CHECKOUT)
+    // ==========================================
+
+    /**
+     * Ghi nhận sử dụng voucher trong transaction đặt hàng của Module E.
+     * Sử dụng pessimistic lock để tránh race condition số lượt dùng.
+     *
+     * @param em EntityManager từ transaction của Order
+     * @param code Mã voucher
+     * @param orderValue Giá trị đơn hàng để tái kiểm tra tính hợp lệ
+     * @return Số tiền giảm giá được áp dụng
+     */
+    public static BigDecimal redeem(EntityManager em, String code, BigDecimal orderValue) {
+        if (code == null || code.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        String normalizedCode = code.trim().toUpperCase();
+        Voucher voucher = VoucherDB.findByCodeWithLock(em, normalizedCode);
+        if (voucher == null) {
+            throw new NotFoundException("Mã voucher '" + normalizedCode + "' không tồn tại.");
+        }
+
+        BigDecimal discount = voucher.calculateDiscount(orderValue);
+        voucher.setUsedCount(voucher.getUsedCount() + 1);
+        VoucherDB.update(em, voucher);
+
+        return discount;
+    }
+
+    /**
+     * Hoàn lại lượt dùng của voucher khi đơn hàng bị hủy trong transaction của Module E.
+     *
+     * @param em EntityManager từ transaction của Order
+     * @param code Mã voucher
+     */
+    public static void release(EntityManager em, String code) {
+        if (code == null || code.trim().isEmpty()) {
+            return;
+        }
+
+        String normalizedCode = code.trim().toUpperCase();
+        Voucher voucher = VoucherDB.findByCodeWithLock(em, normalizedCode);
+        if (voucher != null) {
+            voucher.setUsedCount(Math.max(0, voucher.getUsedCount() - 1));
+            VoucherDB.update(em, voucher);
         }
     }
 
