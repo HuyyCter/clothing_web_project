@@ -25,14 +25,6 @@ public class ProductDTO {
             dto.categoryId = product.getCategory().getId();
             dto.categoryName = product.getCategory().getName();
         }
-
-        // if (product.getVariants() != null) {
-        // dto.variants = product.getVariants().stream().map(ProductVariantDTO::fromEntity).toList();
-        // }
-
-        // if (product.getImages() != null) {
-        // dto.images = product.getImages().stream().map(ProductImageDTO::fromEntity).toList();
-        // }
         return dto;
     }
 
@@ -77,10 +69,6 @@ public class ProductDTO {
     }
 
     public boolean isActive() {
-        return isActive;
-    }
-
-    public boolean getIsActive() {
         return isActive;
     }
 

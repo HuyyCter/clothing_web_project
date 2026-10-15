@@ -3,7 +3,7 @@ package com.ecommerce.validator;
 import com.ecommerce.dto.ProductImageDTO;
 
 public class ProductImageValidator {
-    private static final int COLOR_MAX_LENGTH = 100;
+    private static final int COLOR_MAX_LENGTH = 255;
     private static final long MAX_FILE_SIZE = 5L * 1024 * 1024;
 
     public static String validate(ProductImageDTO dto) {
@@ -28,10 +28,10 @@ public class ProductImageValidator {
             return "Ảnh phải thuộc về một sản phẩm";
         }
 
-        if (color == null || color.trim().isEmpty()) {
+        if (color.isEmpty()) {
             return "Màu của ảnh không được để trống";
         }
-        if (color.trim().length() > COLOR_MAX_LENGTH) {
+        if (color.length() > COLOR_MAX_LENGTH) {
             return "Màu của ảnh không được vượt quá " + COLOR_MAX_LENGTH + " ký tự";
         }
 
