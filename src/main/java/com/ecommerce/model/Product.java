@@ -191,7 +191,6 @@ public class Product {
         }
     }
 
-    // CHƯA HOÀN THIỆN
     public static ProductDTO getById(int id) {
         EntityManager em = JpaUtil.getEntityManager().createEntityManager();
 

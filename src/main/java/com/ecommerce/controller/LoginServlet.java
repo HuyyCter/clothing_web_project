@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("logoName", user.getFullName() != null ? user.getFullName() : user.getEmail());
 
                     if (user.getRole() == UserRole.ADMIN) {
-                        response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                        response.sendRedirect(request.getContextPath() + "/admin-home.jsp");
                     } else {
                         response.sendRedirect(request.getContextPath() + "/index.jsp");
                     }
