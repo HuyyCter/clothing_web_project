@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ taglib uri="jakarta.tags.core" prefix="c" %>
         <%-- Truy cập thẳng "/" hoặc "/index.jsp" chưa có dữ liệu -> chuyển qua HomeServlet nạp danh mục rồi quay lại
             trang này --%>
@@ -58,24 +58,34 @@
                                     <span class="navbar__cart-badge">2</span>
                                 </a>
                                 <div class="navbar__divider"></div>
-                                <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Tài khoản">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                        <circle cx="12" cy="7" r="4" />
-                                    </svg>
-                                    <span id="logoText">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.user}">
-                                                <c:out value="${sessionScope.user.fullName}" />
-                                            </c:when>
-                                            <c:when test="${not empty sessionScope.logoName}">
-                                                <c:out value="${sessionScope.logoName}" />
-                                            </c:when>
-                                            <c:otherwise>HuyCter</c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                </a>
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.user}">
+                                        <div class="navbar__user-dropdown" id="userDropdown">
+                                            <button type="button" class="navbar__user-link navbar__user-dropdown-toggle" id="userDropdownBtn" aria-expanded="false" title="Tài khoản">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                    <circle cx="12" cy="7" r="4" />
+                                                </svg>
+                                                <span id="logoText"><c:out value="${not empty sessionScope.user.fullName ? sessionScope.user.fullName : (not empty sessionScope.logoName ? sessionScope.logoName : 'HuyCter')}" /></span>
+                                            </button>
+                                            <div class="navbar__user-menu" id="userMenuPanel">
+                                                <a href="${ctx}/profile">Hồ sơ</a>
+                                                <a href="${ctx}/logout" class="navbar__logout-link">Đăng xuất</a>
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Đăng nhập">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                            </svg>
+                                            <span id="logoText"><c:out value="${not empty sessionScope.logoName ? sessionScope.logoName : 'Đăng nhập'}" /></span>
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
                             </nav>
                         </div>
                     </header>
@@ -193,12 +203,18 @@
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function () {
-                                var navUserLink = document.getElementById('navUserLink');
-                                if (navUserLink) {
-                                    navUserLink.addEventListener('click', function () {
-                                        var logoText = document.getElementById('logoText');
-                                        if (logoText) {
-                                            logoText.textContent = 'Guest';
+                                var userDropdown = document.getElementById('userDropdown');
+                                var userDropdownBtn = document.getElementById('userDropdownBtn');
+                                if (userDropdown && userDropdownBtn) {
+                                    userDropdownBtn.addEventListener('click', function (e) {
+                                        e.stopPropagation();
+                                        var isOpen = userDropdown.classList.toggle('is-open');
+                                        userDropdownBtn.setAttribute('aria-expanded', isOpen);
+                                    });
+                                    document.addEventListener('click', function (e) {
+                                        if (!userDropdown.contains(e.target)) {
+                                            userDropdown.classList.remove('is-open');
+                                            userDropdownBtn.setAttribute('aria-expanded', 'false');
                                         }
                                     });
                                 }
