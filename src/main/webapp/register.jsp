@@ -1,5 +1,6 @@
 <%-- File: register.jsp Mô tả: Giao diện đăng ký cho MVC2 clothing web project Author: Hermes Agent --%>
     <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="vi" dir="ltr">
 
@@ -20,24 +21,31 @@
 
                     <p>Đăng ký để nhận trải nghiệm mua sắm riêng tư</p>
 
+                    <c:if test="${not empty requestScope.errorMessage}">
+                        <div
+                            style="color: #b91c1c; background-color: #fef2f2; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <c:out value="${requestScope.errorMessage}" />
+                        </div>
+                    </c:if>
+
                     <!-- Register Form -->
-                    <form action="register" method="post">
+                    <form action="${pageContext.request.contextPath}/register" method="post">
                         <div class="form-group">
                             <label for="fullname" class="form-label">Tên đầy đủ</label>
                             <input type="text" id="fullname" name="fullName" class="form-input"
-                                placeholder="Ví dụ: Nguyễn Văn A" required>
+                                placeholder="Ví dụ: Nguyễn Văn A" value="<c:out value='${param.fullName}' />" required>
                         </div>
 
                         <div class="form-group">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" id="email" name="email" class="form-input"
-                                placeholder="example@email.com" required>
+                                placeholder="example@email.com" value="<c:out value='${param.email}' />" required>
                         </div>
 
                         <div class="form-group">
                             <label for="phone" class="form-label">Số điện thoại</label>
                             <input type="tel" id="phone" name="phone" class="form-input" placeholder="09xxxxxxxx"
-                                required>
+                                value="<c:out value='${param.phone}' />" required>
                         </div>
 
                         <div class="form-group">

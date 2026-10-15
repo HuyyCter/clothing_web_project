@@ -32,12 +32,14 @@ change.
 - [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt.
 - [x] `src/main/java/com/ecommerce/repository/UserRepository.java` & `UserDB.java` — Quản lý truy vấn User.
 - [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
-- [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký.
+- [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký (đã cập nhật hiển thị errorMessage).
+- [x] `src/main/java/com/ecommerce/controller/RegisterServlet.java` — Servlet xử lý đăng ký tài khoản mới và tạo session đăng nhập tự động.
 
 ## In Progress
 
 - Hoàn thiện luồng xác thực Customer/Admin và tích hợp với client side.
 - Unit "CRUD Category": còn test thủ công. Rule chặn xóa khi còn sản phẩm chưa làm (đang có TODO trong Category.delete), cần thêm query đếm sản phẩm trong CategoryDB sau khi có entity Product.
+- [Bug UI] Sửa lỗi tính năng hiện/ẩn mật khẩu: icon/nút toggle chỉ xuất hiện khi bắt đầu nhập vào ô trống.
 
 ## Next Up
 
@@ -47,6 +49,8 @@ change.
   (chia unit / viết spec feature) — không tự động làm tiếp.
 
 ## Open Questions
+
+- [Bug/UI] Tính năng hiện mật khẩu hoạt động không ổn định: nút/icon chỉ xuất hiện khi bắt đầu nhập vào ô trống (cần chuẩn hóa hiển thị giữa CSS và JavaScript cho ô input password).
 
 ## Architecture Decisions
 
