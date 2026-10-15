@@ -18,35 +18,26 @@ change.
 
 ## Completed
 
-- `model/Category.java` (id, name, description, slug) — khớp class
-  diagram, danh mục phẳng, không có parent. Có business method
-  `create`, `update`, `delete`, `getById`, `getAll` (Model tự mở
-  `EntityManager` + transaction, trả/nhận `CategoryDTO`).
-- `dto/CategoryDTO.java` — id, name, description, slug; có
-  `fromEntity`. Không dùng annotation validation.
-- `validator/CategoryValidator.java` — `validate(CategoryDTO)` bằng
-  if/else, trả thông báo lỗi hoặc `null`.
-- `controller/AdminCategoryServlet.java` (`/AdminCategoryServlet`):
-  GET list / `action=new` / `action=edit&id=`; POST
-  `action=create|update|delete`. Lỗi validate thì forward lại form
-  kèm `formError`; thành công thì forward về list kèm
-  `successMessage`.
-- `views/admin/category-list.jsp`, `category-form.jsp` — nối với
-  Servlet bằng JSTL (không scriptlet), bỏ phần cha/con, tìm kiếm,
-  lọc, phân trang, cột số sản phẩm; form dùng chung cho tạo/sửa, có
-  thêm ô Mô tả.
-- `util/SlugUtil.java` — `toSlug(String)` bỏ dấu tiếng Việt, ra
-  dạng `ao-thun-nam`.
-- `repository/CategoryDB.java` — insert/update/delete/findById/
-  findAll/existsBySlug/existsBySlugExcludingId, static method nhận
-  `EntityManager` từ Model, không mở transaction, không try-catch.
+- `model/Category.java` (id, name, description, slug) — khớp class diagram, danh mục phẳng. Có business method create, update, delete, getById, getAll.
+- `dto/CategoryDTO.java`, `validator/CategoryValidator.java`, `controller/AdminCategoryServlet.java`.
+- `views/admin/category-list.jsp`, `category-form.jsp` — nối với Servlet bằng JSTL.
+- `util/SlugUtil.java`, `repository/CategoryDB.java`.
+- [x] `src/main/webapp/index.jsp` — Giao diện trang chủ cửa hàng (Hero banner, danh mục nổi bật, sản phẩm mới, tính năng).
+- [x] `src/main/webapp/assets/css/admin.css` & `common.css` — Hệ thống design token và CSS thuần quản trị viên.
+- [x] `src/main/webapp/WEB-INF/views/admin/dashboard.jsp` — Tổng quan thống kê doanh thu, đơn hàng, khách hàng, biểu đồ và bảng hoạt động.
+- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` & `product-form.jsp` — Quản lý sản phẩm, biến thể và liên kết ảnh Cloudinary.
+- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` & `order-detail.jsp` — Danh sách và chi tiết đơn hàng.
+- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` & `voucher-form.jsp` — Quản lý voucher.
+- [x] `src/main/java/com/ecommerce/model/Address.java` — Entity Address có recipientName và phone.
+- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt.
+- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` & `UserDB.java` — Quản lý truy vấn User.
+- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
+- [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký.
 
 ## In Progress
 
-- Unit "CRUD Category": còn test thủ công. Rule chặn
-  xóa khi còn sản phẩm chưa làm (đang có `TODO` trong
-  `Category.delete`), cần thêm query đếm sản phẩm trong `CategoryDB`
-  sau khi có entity `Product`.
+- Hoàn thiện luồng xác thực Customer/Admin và tích hợp với client side.
+- Unit "CRUD Category": còn test thủ công. Rule chặn xóa khi còn sản phẩm chưa làm (đang có TODO trong Category.delete), cần thêm query đếm sản phẩm trong CategoryDB sau khi có entity Product.
 
 ## Next Up
 
