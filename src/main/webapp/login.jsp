@@ -33,9 +33,9 @@
                         <!-- Login Form -->
                         <form action="${pageContext.request.contextPath}/login" method="post">
                             <div class="form-group">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" id="email" name="email" class="form-input"
-                                    placeholder="example@email.com" required>
+                                <label for="email" class="form-label">Email hoặc Số điện thoại</label>
+                                <input type="text" id="email" name="email" class="form-input"
+                                    placeholder="example@email.com hoặc 09xxxxxxxx" required>
                             </div>
 
                             <div class="form-group">

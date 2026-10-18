@@ -34,12 +34,14 @@ change.
 - [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
 - [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký (đã cập nhật hiển thị errorMessage).
 - [x] `src/main/java/com/ecommerce/controller/RegisterServlet.java` — Servlet xử lý đăng ký tài khoản mới và tạo session đăng nhập tự động.
-- [x] `src/main/java/com/ecommerce/controller/ProfileServlet.java`, `dto/UserDTO.java`, `dto/AddressDTO.java`, `validator/ProfileValidator.java` — Xử lý hiển thị thông tin tài khoản, cập nhật họ tên, đổi mật khẩu (xác nhận mật khẩu cũ) và quản lý sổ địa chỉ.
-- [x] `src/main/webapp/WEB-INF/views/user/profile.jsp` — Giao diện hồ sơ cá nhân theo mô hình MVC, gồm thông tin cơ bản, form đổi mật khẩu và view hiển thị/thêm địa chỉ giao hàng.
+- [x] `src/main/java/com/ecommerce/controller/ProfileServlet.java`, `dto/UserDTO.java`, `dto/AddressDTO.java`, `validator/ProfileValidator.java` — Xử lý hiển thị thông tin tài khoản, cập nhật họ tên, đổi mật khẩu (xác nhận mật khẩu cũ) và hoàn thiện trọn vẹn Address CRUD (thêm, sửa, xóa, đặt mặc định).
+- [x] `src/main/webapp/WEB-INF/views/user/profile.jsp` — Giao diện hồ sơ cá nhân theo mô hình MVC, gồm thông tin cơ bản, đổi mật khẩu, danh sách địa chỉ, modal sửa địa chỉ và form thêm địa chỉ.
+- [x] `src/main/java/com/ecommerce/filter/AuthFilter.java` & `AdminFilter.java` — Bộ lọc phân quyền session cho các URL khách hàng cần đăng nhập và URL quản trị Admin (kèm `WEB-INF/views/error/error-403.jsp`).
+- [x] `OrderDTO.java`, `OrderItemDTO.java`, `OrderDB.java`, `ProfileServlet.java`, `profile.jsp`, `customer.css` — Bổ sung tab "Đơn hàng của tôi" trong trang Profile khách hàng: hiển thị danh sách đơn hàng, chi tiết sản phẩm/biến thể/ảnh/giá, tình trạng đơn hàng với badge màu chuẩn state machine, bộ lọc theo trạng thái, snapshot thông tin giao hàng & phương thức thanh toán, cùng tính năng hủy đơn hàng (khi đang ở trạng thái Chờ xác nhận hoặc Đã xác nhận).
+- [x] `UserDB.java`, `UserRepository.java`, `LoginServlet.java`, `login.jsp`, `ProfileValidator.java`, `ProfileServlet.java`, `profile.jsp`, `customer.css` — Hoàn thiện tính năng đổi số điện thoại trong Profile với bước xác minh an toàn (yêu cầu gõ đúng dòng lệnh `Change Phone [sdt mới]`) và hỗ trợ đăng nhập hệ thống linh hoạt bằng Email hoặc Số điện thoại.
 
 ## In Progress
 
-- Hoàn thiện luồng xác thực Customer/Admin và tích hợp với client side.
 - Unit "CRUD Category": còn test thủ công. Rule chặn xóa khi còn sản phẩm chưa làm (đang có TODO trong Category.delete), cần thêm query đếm sản phẩm trong CategoryDB sau khi có entity Product.
 - [Bug UI] Sửa lỗi tính năng hiện/ẩn mật khẩu: icon/nút toggle chỉ xuất hiện khi bắt đầu nhập vào ô trống.
 

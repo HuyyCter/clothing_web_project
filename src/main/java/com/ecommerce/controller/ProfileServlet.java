@@ -1,9 +1,13 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.AddressDTO;
+import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.dto.UserDTO;
 import com.ecommerce.model.Address;
+import com.ecommerce.model.Order;
+import com.ecommerce.model.OrderStatus;
 import com.ecommerce.model.User;
+import com.ecommerce.repository.OrderDB;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.util.JpaUtil;
 import com.ecommerce.util.PasswordUtil;
@@ -131,6 +135,16 @@ public class ProfileServlet extends HttpServlet {
                 handleChangePassword(request, session, em, user);
             } else if ("addAddress".equalsIgnoreCase(action)) {
                 handleAddAddress(request, em, user);
+            } else if ("editAddress".equalsIgnoreCase(action)) {
+                handleEditAddress(request, em, userId);
+            } else if ("deleteAddress".equalsIgnoreCase(action)) {
+                handleDeleteAddress(request, em, userId);
+            } else if ("setDefaultAddress".equalsIgnoreCase(action)) {
+                handleSetDefaultAddress(request, em, userId);
+            } else if ("cancelOrder".equalsIgnoreCase(action)) {
+                handleCancelOrder(request, em, userId);
+            } else if ("updatePhone".equalsIgnoreCase(action)) {
+                handleUpdatePhone(request, session, em, user, userId);
             }
 
             populateProfileData(em, userId, session, request);
@@ -173,6 +187,38 @@ public class ProfileServlet extends HttpServlet {
         session.setAttribute("user", user);
         session.setAttribute("logoName", user.getFullName());
         request.setAttribute("successMessage", "Cập nhật họ và tên thành công!");
+    }
+
+    private void handleUpdatePhone(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
+        String newPhone = request.getParameter("newPhone");
+        String confirmCommand = request.getParameter("confirmCommand");
+
+        request.setAttribute("activeTab", "profile");
+
+        String error = ProfileValidator.validateUpdatePhone(user.getPhone(), newPhone, confirmCommand);
+        if (error != null) {
+            request.setAttribute("errorMessage", error);
+            return;
+        }
+
+        if (em != null) {
+            UserRepository userRepo = new UserRepository(em);
+            Optional<User> existingUser = userRepo.findByPhone(em, newPhone.trim());
+            if (existingUser.isPresent() && existingUser.get().getId() != userId) {
+                request.setAttribute("errorMessage", "Số điện thoại này đã được sử dụng bởi một tài khoản khác.");
+                return;
+            }
+
+            em.getTransaction().begin();
+            user.setPhone(newPhone.trim());
+            em.merge(user);
+            em.getTransaction().commit();
+        } else {
+            user.setPhone(newPhone.trim());
+        }
+
+        session.setAttribute("user", user);
+        request.setAttribute("successMessage", "Thay đổi số điện thoại thành công thành: " + newPhone.trim());
     }
 
     private void handleChangePassword(HttpServletRequest request, HttpSession session, EntityManager em, User user) {
@@ -252,6 +298,183 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("successMessage", "Thêm địa chỉ giao hàng thành công!");
     }
 
+    private void handleEditAddress(HttpServletRequest request, EntityManager em, int userId) {
+        String addressIdStr = request.getParameter("addressId");
+        request.setAttribute("activeTab", "address");
+
+        if (addressIdStr == null || addressIdStr.isBlank()) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        int addressId;
+        try {
+            addressId = Integer.parseInt(addressIdStr.trim());
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        String recipientName = request.getParameter("recipientName");
+        String phone = request.getParameter("phone");
+        String street = request.getParameter("street");
+        String ward = request.getParameter("ward");
+        String district = request.getParameter("district");
+        String city = request.getParameter("city");
+        boolean isDefault = "true".equalsIgnoreCase(request.getParameter("isDefault"))
+                || "on".equalsIgnoreCase(request.getParameter("isDefault"));
+
+        String error = ProfileValidator.validateAddress(recipientName, phone, street, city);
+        if (error != null) {
+            request.setAttribute("errorMessage", error);
+            return;
+        }
+
+        if (em != null) {
+            Address address = em.find(Address.class, addressId);
+            if (address == null || address.getUser() == null || address.getUser().getId() != userId) {
+                request.setAttribute("errorMessage", "Bạn không có quyền chỉnh sửa địa chỉ này hoặc địa chỉ không tồn tại.");
+                return;
+            }
+
+            em.getTransaction().begin();
+            if (isDefault) {
+                try {
+                    em.createQuery("UPDATE Address a SET a.isDefault = false WHERE a.user.id = :userId")
+                            .setParameter("userId", userId)
+                            .executeUpdate();
+                } catch (Throwable t) {
+                    System.err.println("[ProfileServlet] Lỗi reset default address: " + t.getMessage());
+                }
+            }
+
+            address.setRecipientName(recipientName.trim());
+            address.setPhone(phone.trim());
+            address.setStreet(street.trim());
+            address.setWard(ward != null ? ward.trim() : "");
+            address.setDistrict(district != null ? district.trim() : "");
+            address.setCity(city.trim());
+            address.setDefault(isDefault);
+
+            em.merge(address);
+            em.getTransaction().commit();
+        }
+
+        request.setAttribute("successMessage", "Cập nhật địa chỉ thành công!");
+    }
+
+    private void handleDeleteAddress(HttpServletRequest request, EntityManager em, int userId) {
+        String addressIdStr = request.getParameter("addressId");
+        request.setAttribute("activeTab", "address");
+
+        if (addressIdStr == null || addressIdStr.isBlank()) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        int addressId;
+        try {
+            addressId = Integer.parseInt(addressIdStr.trim());
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        if (em != null) {
+            Address address = em.find(Address.class, addressId);
+            if (address == null || address.getUser() == null || address.getUser().getId() != userId) {
+                request.setAttribute("errorMessage", "Bạn không có quyền xóa địa chỉ này hoặc địa chỉ không tồn tại.");
+                return;
+            }
+
+            em.getTransaction().begin();
+            em.remove(address);
+            em.getTransaction().commit();
+        }
+
+        request.setAttribute("successMessage", "Đã xóa địa chỉ thành công!");
+    }
+
+    private void handleSetDefaultAddress(HttpServletRequest request, EntityManager em, int userId) {
+        String addressIdStr = request.getParameter("addressId");
+        request.setAttribute("activeTab", "address");
+
+        if (addressIdStr == null || addressIdStr.isBlank()) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        int addressId;
+        try {
+            addressId = Integer.parseInt(addressIdStr.trim());
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Mã địa chỉ không hợp lệ.");
+            return;
+        }
+
+        if (em != null) {
+            Address address = em.find(Address.class, addressId);
+            if (address == null || address.getUser() == null || address.getUser().getId() != userId) {
+                request.setAttribute("errorMessage", "Bạn không có quyền thao tác trên địa chỉ này.");
+                return;
+            }
+
+            em.getTransaction().begin();
+            try {
+                em.createQuery("UPDATE Address a SET a.isDefault = false WHERE a.user.id = :userId")
+                        .setParameter("userId", userId)
+                        .executeUpdate();
+            } catch (Throwable t) {
+                System.err.println("[ProfileServlet] Lỗi reset default: " + t.getMessage());
+            }
+
+            address.setDefault(true);
+            em.merge(address);
+            em.getTransaction().commit();
+        }
+
+        request.setAttribute("successMessage", "Đã đặt làm địa chỉ giao hàng mặc định!");
+    }
+
+    private void handleCancelOrder(HttpServletRequest request, EntityManager em, int userId) {
+        String orderIdStr = request.getParameter("orderId");
+        request.setAttribute("activeTab", "orders");
+
+        if (orderIdStr == null || orderIdStr.isBlank()) {
+            request.setAttribute("errorMessage", "Mã đơn hàng không hợp lệ.");
+            return;
+        }
+
+        int orderId;
+        try {
+            orderId = Integer.parseInt(orderIdStr.trim());
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Mã đơn hàng không hợp lệ.");
+            return;
+        }
+
+        if (em != null) {
+            Order order = OrderDB.findByIdAndUserId(em, orderId, userId);
+            if (order == null) {
+                request.setAttribute("errorMessage", "Không tìm thấy đơn hàng hoặc bạn không có quyền hủy đơn hàng này.");
+                return;
+            }
+
+            // Theo Invariant 2: Hủy chỉ được phép thực hiện từ "Chờ xác nhận" hoặc "Đã xác nhận"
+            if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+                request.setAttribute("errorMessage", "Đơn hàng đang ở trạng thái không thể hủy trực tiếp.");
+                return;
+            }
+
+            em.getTransaction().begin();
+            order.setStatus(OrderStatus.CANCELLED);
+            OrderDB.update(em, order);
+            em.getTransaction().commit();
+
+            request.setAttribute("successMessage", "Đã hủy đơn hàng #" + String.format("%05d", orderId) + " thành công.");
+        }
+    }
+
     private void populateProfileData(EntityManager em, int userId, HttpSession session, HttpServletRequest request) {
         UserDTO userDTO = null;
         User sessionUser = (session != null) ? (User) session.getAttribute("user") : null;
@@ -289,7 +512,7 @@ public class ProfileServlet extends HttpServlet {
         if (em != null) {
             try {
                 TypedQuery<Address> query = em.createQuery(
-                        "SELECT a FROM Address a WHERE a.user.id = :userId ORDER BY a.id DESC",
+                        "SELECT a FROM Address a WHERE a.user.id = :userId ORDER BY a.isDefault DESC, a.id DESC",
                         Address.class
                 );
                 query.setParameter("userId", userId);
@@ -302,8 +525,21 @@ public class ProfileServlet extends HttpServlet {
             }
         }
 
+        List<OrderDTO> orderDTOs = new ArrayList<>();
+        if (em != null) {
+            try {
+                List<Order> orders = OrderDB.findByUserId(em, userId);
+                for (Order order : orders) {
+                    orderDTOs.add(new OrderDTO(order));
+                }
+            } catch (Throwable t) {
+                System.err.println("[ProfileServlet] Không thể tải danh sách orders: " + t.getMessage());
+            }
+        }
+
         userDTO.setAddresses(addressDTOs);
         request.setAttribute("userDTO", userDTO);
         request.setAttribute("addresses", addressDTOs);
+        request.setAttribute("orders", orderDTOs);
     }
 }

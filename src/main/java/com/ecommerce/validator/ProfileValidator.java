@@ -40,6 +40,30 @@ public class ProfileValidator {
         return null;
     }
 
+    private static final Pattern PHONE_PATTERN =
+        Pattern.compile("^(0|\\+84)[1-9][0-9]{8}$");
+
+    public static String validateUpdatePhone(String currentPhone, String newPhone, String confirmCommand) {
+        if (newPhone == null || newPhone.trim().isEmpty()) {
+            return "Số điện thoại mới không được để trống.";
+        }
+        String trimmedPhone = newPhone.trim();
+        if (!PHONE_PATTERN.matcher(trimmedPhone).matches()) {
+            return "Số điện thoại không hợp lệ (cần 10 chữ số, ví dụ: 0912345678).";
+        }
+        if (currentPhone != null && currentPhone.trim().equals(trimmedPhone)) {
+            return "Số điện thoại mới không được trùng với số điện thoại hiện tại.";
+        }
+        if (confirmCommand == null || confirmCommand.trim().isEmpty()) {
+            return "Vui lòng nhập dòng lệnh xác minh.";
+        }
+        String expectedCommand = "Change Phone " + trimmedPhone;
+        if (!confirmCommand.trim().equalsIgnoreCase(expectedCommand)) {
+            return "Dòng lệnh xác minh không chính xác. Bạn cần nhập đúng: " + expectedCommand;
+        }
+        return null;
+    }
+
     public static String validateAddress(String recipientName, String phone, String street, String city) {
         if (recipientName == null || recipientName.trim().isEmpty()) {
             return "Tên người nhận không được để trống.";

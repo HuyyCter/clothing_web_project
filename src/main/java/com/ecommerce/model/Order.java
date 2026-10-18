@@ -25,6 +25,24 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private OrderStatus status;
+
+    @Column(name = "total_amount", precision = 12, scale = 2)
+    private java.math.BigDecimal totalAmount = java.math.BigDecimal.ZERO;
+
+    @Column(name = "shipping_recipient_name")
+    private String shippingRecipientName;
+
+    @Column(name = "shipping_phone")
+    private String shippingPhone;
+
+    @Column(name = "shipping_address_line")
+    private String shippingAddressLine;
+
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
+    @Column(name = "note")
+    private String note;
     
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -89,6 +107,54 @@ public class Order {
         this.status = status;
     }
     
+    public java.math.BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(java.math.BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getShippingRecipientName() {
+        return shippingRecipientName;
+    }
+
+    public void setShippingRecipientName(String shippingRecipientName) {
+        this.shippingRecipientName = shippingRecipientName;
+    }
+
+    public String getShippingPhone() {
+        return shippingPhone;
+    }
+
+    public void setShippingPhone(String shippingPhone) {
+        this.shippingPhone = shippingPhone;
+    }
+
+    public String getShippingAddressLine() {
+        return shippingAddressLine;
+    }
+
+    public void setShippingAddressLine(String shippingAddressLine) {
+        this.shippingAddressLine = shippingAddressLine;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

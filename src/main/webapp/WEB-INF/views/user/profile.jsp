@@ -126,6 +126,17 @@
                             </svg>
                             Thông tin cá nhân
                         </button>
+                        <button type="button" class="profile-nav__btn ${activeTab eq 'orders' ? 'is-active' : ''}" data-target="tab-orders">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                <line x1="3" y1="6" x2="21" y2="6" />
+                                <path d="M16 10a4 4 0 0 1-8 0" />
+                            </svg>
+                            Đơn hàng của tôi
+                            <c:if test="${not empty orders}">
+                                <span class="profile-badge-count"><c:out value="${orders.size()}" /></span>
+                            </c:if>
+                        </button>
                         <button type="button" class="profile-nav__btn ${activeTab eq 'password' ? 'is-active' : ''}" data-target="tab-password">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -186,11 +197,20 @@
                             <div class="profile-form-group">
                                 <label for="phone" class="profile-label">
                                     Số điện thoại
-                                    <span class="profile-label-badge">Tài khoản</span>
+                                    <span class="profile-label-badge" style="color: var(--primary-bg);">Có thể đổi kèm xác minh</span>
                                 </label>
-                                <input type="text" id="phone" class="profile-input" 
-                                       value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa cập nhật\"}' />" readonly disabled>
-                                <div class="profile-helper">Số điện thoại liên hệ gắn với tài khoản của bạn.</div>
+                                <div class="phone-display-group">
+                                    <input type="text" id="phone" class="profile-input" 
+                                           value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa cập nhật\"}' />" readonly>
+                                    <button type="button" class="btn-change-phone" id="openPhoneModalBtn" title="Thay đổi số điện thoại">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                        Đổi SĐT
+                                    </button>
+                                </div>
+                                <div class="profile-helper">Số điện thoại dùng để đăng nhập vào hệ thống và liên hệ giao hàng.</div>
                             </div>
 
                             <button type="submit" class="profile-btn-primary">
@@ -308,13 +328,46 @@
                                             <div class="address-card__body">
                                                 <c:out value="${addr.fullAddress}" />
                                             </div>
+
+                                            <!-- Các nút thao tác Address CRUD -->
+                                            <div class="address-card__actions">
+                                                <c:if test="${not addr.isDefault}">
+                                                    <form action="${ctx}/profile" method="post" style="display:inline;">
+                                                        <input type="hidden" name="action" value="setDefaultAddress">
+                                                        <input type="hidden" name="addressId" value="${addr.id}">
+                                                        <button type="submit" class="address-btn address-btn--default">
+                                                            ✓ Đặt làm mặc định
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+
+                                                <button type="button" class="address-btn address-btn--edit" 
+                                                        data-id="${addr.id}"
+                                                        data-name="<c:out value='${addr.recipientName}' />"
+                                                        data-phone="<c:out value='${addr.phone}' />"
+                                                        data-city="<c:out value='${addr.city}' />"
+                                                        data-district="<c:out value='${addr.district}' />"
+                                                        data-ward="<c:out value='${addr.ward}' />"
+                                                        data-street="<c:out value='${addr.street}' />"
+                                                        data-default="${addr.isDefault}">
+                                                    ✎ Chỉnh sửa
+                                                </button>
+
+                                                <form action="${ctx}/profile" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');">
+                                                    <input type="hidden" name="action" value="deleteAddress">
+                                                    <input type="hidden" name="addressId" value="${addr.id}">
+                                                    <button type="submit" class="address-btn address-btn--delete">
+                                                        ✕ Xóa
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </c:forEach>
                                 </div>
                             </c:otherwise>
                         </c:choose>
 
-                        <!-- Form thêm địa chỉ mới (tạo trước view) -->
+                        <!-- Form thêm địa chỉ mới -->
                         <div class="address-form-box">
                             <h3 class="address-form-box__title">
                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -385,10 +438,318 @@
                         </div>
                     </div>
 
+                    <!-- TAB 4: DANH SÁCH ĐƠN HÀNG -->
+                    <div id="tab-orders" class="tab-panel ${activeTab eq 'orders' ? 'is-active' : ''}">
+                        <div class="profile-orders-header">
+                            <div>
+                                <h2 class="profile-section-title">Đơn Hàng Của Tôi</h2>
+                                <p class="profile-section-desc">Theo dõi tình trạng đơn hàng và xem lại lịch sử các sản phẩm bạn đã đặt.</p>
+                            </div>
+                            <c:if test="${not empty orders}">
+                                <div class="order-quick-summary">
+                                    Tổng cộng: <strong>${orders.size()} đơn hàng</strong>
+                                </div>
+                            </c:if>
+                        </div>
+
+                        <c:choose>
+                            <c:when test="${empty orders}">
+                                <div class="profile-empty-orders">
+                                    <div class="profile-empty-orders__icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                            <line x1="3" y1="6" x2="21" y2="6" />
+                                            <path d="M16 10a4 4 0 0 1-8 0" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="profile-empty-orders__title">Bạn chưa có đơn hàng nào</h3>
+                                    <p class="profile-empty-orders__desc">Hãy khám phá bộ sưu tập trang phục thời trang mới nhất và chọn cho mình phong cách ưng ý nhé!</p>
+                                    <a href="${ctx}/" class="profile-btn-primary" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="9" cy="21" r="1" />
+                                            <circle cx="20" cy="21" r="1" />
+                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                                        </svg>
+                                        Khám phá sản phẩm ngay
+                                    </a>
+                                </div>
+                            </c:when>
+
+                            <c:otherwise>
+                                <!-- Filter Status Pills -->
+                                <div class="order-filter-pills" role="tablist">
+                                    <button type="button" class="order-pill is-active" data-filter="ALL">Tất cả (${orders.size()})</button>
+                                    <button type="button" class="order-pill" data-filter="PENDING">Chờ xác nhận</button>
+                                    <button type="button" class="order-pill" data-filter="CONFIRMED">Đã xác nhận</button>
+                                    <button type="button" class="order-pill" data-filter="SHIPPING">Đang giao</button>
+                                    <button type="button" class="order-pill" data-filter="DELIVERED">Đã giao</button>
+                                    <button type="button" class="order-pill" data-filter="CANCELLED">Đã hủy</button>
+                                </div>
+
+                                <div class="order-list">
+                                    <c:forEach var="order" items="${orders}">
+                                        <div class="order-card" data-order-status="${order.status}">
+                                            <!-- HEADER THẺ ĐƠN HÀNG -->
+                                            <div class="order-card__header">
+                                                <div class="order-card__meta-left">
+                                                    <span class="order-code"><c:out value="${order.orderCode}" /></span>
+                                                    <span class="order-card__divider">&bull;</span>
+                                                    <span class="order-date">
+                                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                                            <line x1="16" y1="2" x2="16" y2="6" />
+                                                            <line x1="8" y1="2" x2="8" y2="6" />
+                                                            <line x1="3" y1="10" x2="21" y2="10" />
+                                                        </svg>
+                                                        <c:out value="${order.formattedCreatedAt}" default="N/A" />
+                                                    </span>
+                                                </div>
+                                                <div class="order-card__meta-right">
+                                                    <span class="order-status-badge ${order.statusBadgeClass}">
+                                                        <span class="order-status-dot"></span>
+                                                        <c:out value="${order.statusName}" />
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- DANH SÁCH MẶT HÀNG TRONG ĐƠN -->
+                                            <div class="order-card__items">
+                                                <c:choose>
+                                                    <c:when test="${not empty order.items}">
+                                                        <c:forEach var="item" items="${order.items}">
+                                                            <div class="order-item-row">
+                                                                <div class="order-item-row__img">
+                                                                    <c:choose>
+                                                                        <c:when test="${not empty item.imageUrl}">
+                                                                            <img src="${item.imageUrl}" alt="<c:out value='${item.productName}' />" loading="lazy">
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                                                                <line x1="3" y1="6" x2="21" y2="6" />
+                                                                                <path d="M16 10a4 4 0 0 1-8 0" />
+                                                                            </svg>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+
+                                                                <div class="order-item-row__info">
+                                                                    <div class="order-item-row__name">
+                                                                        <c:out value="${item.productName}" default="Sản phẩm thời trang" />
+                                                                    </div>
+                                                                    <div class="order-item-row__variant">
+                                                                        <span>Phân loại: <strong><c:out value="${not empty item.color ? item.color : 'Tiêu chuẩn'}" /></strong> / <strong><c:out value="${not empty item.size ? item.size : 'Freesize'}" /></strong></span>
+                                                                        <c:if test="${not empty item.sku}">
+                                                                            <span class="order-item-row__sku">SKU: <c:out value="${item.sku}" /></span>
+                                                                        </c:if>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="order-item-row__pricing">
+                                                                    <div class="order-item-row__unit">
+                                                                        <c:out value="${item.formattedUnitPrice}" /> &times; <c:out value="${item.quantity}" />
+                                                                    </div>
+                                                                    <div class="order-item-row__subtotal">
+                                                                        <c:out value="${item.formattedSubtotal}" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </c:forEach>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div class="order-item-row--empty">
+                                                            <em>Thông tin chi tiết sản phẩm đang được cập nhật.</em>
+                                                        </div>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+
+                                            <!-- THÔNG TIN GIAO HÀNG & THANH TOÁN -->
+                                            <div class="order-card__shipping-panel">
+                                                <div class="order-shipping-grid">
+                                                    <div class="order-shipping-col">
+                                                        <div class="order-shipping-label">Người nhận & SĐT:</div>
+                                                        <div class="order-shipping-val">
+                                                            <strong><c:out value="${not empty order.shippingRecipientName ? order.shippingRecipientName : userDTO.fullName}" /></strong>
+                                                            <c:if test="${not empty order.shippingPhone}">
+                                                                &bull; <c:out value="${order.shippingPhone}" />
+                                                            </c:if>
+                                                        </div>
+                                                    </div>
+                                                    <div class="order-shipping-col">
+                                                        <div class="order-shipping-label">Địa chỉ giao:</div>
+                                                        <div class="order-shipping-val">
+                                                            <c:out value="${not empty order.shippingAddressLine ? order.shippingAddressLine : 'Giao hàng theo thỏa thuận'}" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="order-shipping-col">
+                                                        <div class="order-shipping-label">Phương thức:</div>
+                                                        <div class="order-shipping-val">
+                                                            <span class="order-payment-tag"><c:out value="${order.paymentMethod}" /></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- FOOTER THẺ ĐƠN HÀNG: TỔNG TIỀN VÀ THAO TÁC -->
+                                            <div class="order-card__footer">
+                                                <div class="order-card__total-box">
+                                                    <span class="order-card__total-label">Thành tiền (${order.totalQuantity} món):</span>
+                                                    <span class="order-card__total-amount"><c:out value="${order.formattedTotalAmount}" /></span>
+                                                </div>
+
+                                                <div class="order-card__action-buttons">
+                                                    <c:if test="${order.canCancel}">
+                                                        <form action="${ctx}/profile" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng ${order.orderCode} không?');">
+                                                            <input type="hidden" name="action" value="cancelOrder">
+                                                            <input type="hidden" name="orderId" value="${order.id}">
+                                                            <button type="submit" class="order-btn order-btn--cancel">
+                                                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <circle cx="12" cy="12" r="10" />
+                                                                    <line x1="15" y1="9" x2="9" y2="15" />
+                                                                    <line x1="9" y1="9" x2="15" y2="15" />
+                                                                </svg>
+                                                                Hủy đơn hàng
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
+                                                    
+                                                    <c:if test="${order.status eq 'DELIVERED'}">
+                                                        <span class="order-success-note">
+                                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                                <polyline points="22 4 12 14.01 9 11.01" />
+                                                            </svg>
+                                                            Đã hoàn tất
+                                                        </span>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
                 </section>
             </div>
         </div>
     </main>
+
+    <!-- MODAL CHỈNH SỬA ĐỊA CHỈ -->
+    <div id="editAddressModal" class="profile-modal" aria-hidden="true">
+        <div class="profile-modal__content">
+            <div class="profile-modal__header">
+                <h3 class="profile-modal__title">Chỉnh Sửa Địa Chỉ Nhận Hàng</h3>
+                <button type="button" class="profile-modal__close" id="closeEditModalBtn" aria-label="Đóng">&times;</button>
+            </div>
+
+            <form action="${ctx}/profile" method="post">
+                <input type="hidden" name="action" value="editAddress">
+                <input type="hidden" name="addressId" id="editAddressId">
+
+                <div class="form-grid-2">
+                    <div class="profile-form-group">
+                        <label for="editRecipientName" class="profile-label">Họ và tên người nhận</label>
+                        <input type="text" id="editRecipientName" name="recipientName" class="profile-input" required>
+                    </div>
+
+                    <div class="profile-form-group">
+                        <label for="editPhone" class="profile-label">Số điện thoại nhận hàng</label>
+                        <input type="tel" id="editPhone" name="phone" class="profile-input" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="profile-form-group">
+                        <label for="editCity" class="profile-label">Tỉnh / Thành phố</label>
+                        <input type="text" id="editCity" name="city" class="profile-input" required>
+                    </div>
+
+                    <div class="profile-form-group">
+                        <label for="editDistrict" class="profile-label">Quận / Huyện</label>
+                        <input type="text" id="editDistrict" name="district" class="profile-input">
+                    </div>
+
+                    <div class="profile-form-group">
+                        <label for="editWard" class="profile-label">Phường / Xã</label>
+                        <input type="text" id="editWard" name="ward" class="profile-input">
+                    </div>
+                </div>
+
+                <div class="profile-form-group">
+                    <label for="editStreet" class="profile-label">Địa chỉ cụ thể (Số nhà, tên đường, tòa nhà)</label>
+                    <input type="text" id="editStreet" name="street" class="profile-input" required>
+                </div>
+
+                <label class="checkbox-container">
+                    <input type="checkbox" name="isDefault" id="editIsDefault" value="true">
+                    Đặt làm địa chỉ nhận hàng mặc định
+                </label>
+
+                <div class="profile-modal__footer">
+                    <button type="button" class="btn-secondary" id="cancelEditModalBtn">Hủy</button>
+                    <button type="submit" class="profile-btn-primary">Cập nhật địa chỉ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL THAY ĐỔI SỐ ĐIỆN THOẠI -->
+    <div id="changePhoneModal" class="profile-modal" aria-hidden="true">
+        <div class="profile-modal__content">
+            <div class="profile-modal__header">
+                <h3 class="profile-modal__title">Thay Đổi Số Điện Thoại</h3>
+                <button type="button" class="profile-modal__close" id="closePhoneModalBtn" aria-label="Đóng">&times;</button>
+            </div>
+
+            <form action="${ctx}/profile" method="post" id="changePhoneForm">
+                <input type="hidden" name="action" value="updatePhone">
+
+                <div class="profile-form-group">
+                    <label class="profile-label">Số điện thoại hiện tại</label>
+                    <input type="text" class="profile-input" value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa có SĐT\"}' />" readonly disabled>
+                </div>
+
+                <div class="profile-form-group">
+                    <label for="modalNewPhone" class="profile-label">
+                        Số điện thoại mới
+                        <span style="color:var(--error-text);">*</span>
+                    </label>
+                    <input type="tel" id="modalNewPhone" name="newPhone" class="profile-input" placeholder="Ví dụ: 0912345678" required maxlength="15">
+                    <div class="profile-helper">Nhập 10 chữ số (bắt đầu bằng 03, 05, 07, 08, 09 hoặc +84...).</div>
+                </div>
+
+                <div class="phone-verify-box">
+                    <div class="phone-verify-box__header">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        Xác minh an toàn: Nhập chính xác dòng lệnh sau
+                    </div>
+                    <div class="phone-verify-command">
+                        <code id="phoneCmdSample">Change Phone [sdt mới]</code>
+                        <button type="button" class="btn-copy-cmd" id="copyCmdBtn" title="Sao chép lệnh vào ô nhập">Sao chép</button>
+                    </div>
+                    <div class="phone-verify-box__note">Để xác nhận thao tác, bạn bắt buộc phải nhập đúng dòng lệnh trên vào ô xác nhận bên dưới.</div>
+                </div>
+
+                <div class="profile-form-group" style="margin-top: 16px;">
+                    <label for="modalConfirmCommand" class="profile-label">
+                        Dòng lệnh xác minh
+                        <span style="color:var(--error-text);">*</span>
+                    </label>
+                    <input type="text" id="modalConfirmCommand" name="confirmCommand" class="profile-input" placeholder="Change Phone [sdt mới]" required autocomplete="off">
+                </div>
+
+                <div class="profile-modal__footer">
+                    <button type="button" class="btn-secondary" id="cancelPhoneModalBtn">Hủy</button>
+                    <button type="submit" class="profile-btn-primary">Xác nhận thay đổi SĐT</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- FOOTER CHUNG -->
     <footer class="footer">
@@ -421,7 +782,7 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT: TAB NAVIGATION & PASSWORD TOGGLE -->
+    <!-- JAVASCRIPT: TAB NAVIGATION, PASSWORD TOGGLE & EDIT MODAL -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Tab switching
@@ -462,6 +823,128 @@
                         eyeHide.style.display = 'none';
                     }
                 });
+            });
+
+            // Edit Address Modal
+            const editModal = document.getElementById('editAddressModal');
+            const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+            const cancelEditModalBtn = document.getElementById('cancelEditModalBtn');
+            const editButtons = document.querySelectorAll('.address-btn--edit');
+
+            function openEditModal(btn) {
+                document.getElementById('editAddressId').value = btn.getAttribute('data-id');
+                document.getElementById('editRecipientName').value = btn.getAttribute('data-name') || '';
+                document.getElementById('editPhone').value = btn.getAttribute('data-phone') || '';
+                document.getElementById('editCity').value = btn.getAttribute('data-city') || '';
+                document.getElementById('editDistrict').value = btn.getAttribute('data-district') || '';
+                document.getElementById('editWard').value = btn.getAttribute('data-ward') || '';
+                document.getElementById('editStreet').value = btn.getAttribute('data-street') || '';
+                document.getElementById('editIsDefault').checked = btn.getAttribute('data-default') === 'true';
+
+                editModal.classList.add('is-open');
+                editModal.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeEditModal() {
+                editModal.classList.remove('is-open');
+                editModal.setAttribute('aria-hidden', 'true');
+            }
+
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    openEditModal(this);
+                });
+            });
+
+            if (closeEditModalBtn) {
+                closeEditModalBtn.addEventListener('click', closeEditModal);
+            }
+            if (cancelEditModalBtn) {
+                cancelEditModalBtn.addEventListener('click', closeEditModal);
+            }
+
+            // Click outside modal content to close
+            window.addEventListener('click', function (e) {
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            // Order Status Pill Filtering
+            const orderPills = document.querySelectorAll('.order-pill');
+            const orderCards = document.querySelectorAll('.order-card');
+
+            orderPills.forEach(pill => {
+                pill.addEventListener('click', function () {
+                    const filter = this.getAttribute('data-filter');
+
+                    orderPills.forEach(p => p.classList.remove('is-active'));
+                    this.classList.add('is-active');
+
+                    orderCards.forEach(card => {
+                        const status = card.getAttribute('data-order-status');
+                        if (filter === 'ALL' || status === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Change Phone Modal
+            const phoneModal = document.getElementById('changePhoneModal');
+            const openPhoneModalBtn = document.getElementById('openPhoneModalBtn');
+            const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
+            const cancelPhoneModalBtn = document.getElementById('cancelPhoneModalBtn');
+            const modalNewPhone = document.getElementById('modalNewPhone');
+            const phoneCmdSample = document.getElementById('phoneCmdSample');
+            const copyCmdBtn = document.getElementById('copyCmdBtn');
+            const modalConfirmCommand = document.getElementById('modalConfirmCommand');
+
+            function openPhoneModal() {
+                if (modalNewPhone) modalNewPhone.value = '';
+                if (modalConfirmCommand) modalConfirmCommand.value = '';
+                if (phoneCmdSample) phoneCmdSample.textContent = 'Change Phone [sdt mới]';
+                phoneModal.classList.add('is-open');
+                phoneModal.setAttribute('aria-hidden', 'false');
+                if (modalNewPhone) modalNewPhone.focus();
+            }
+
+            function closePhoneModal() {
+                phoneModal.classList.remove('is-open');
+                phoneModal.setAttribute('aria-hidden', 'true');
+            }
+
+            if (openPhoneModalBtn) {
+                openPhoneModalBtn.addEventListener('click', openPhoneModal);
+            }
+            if (closePhoneModalBtn) {
+                closePhoneModalBtn.addEventListener('click', closePhoneModal);
+            }
+            if (cancelPhoneModalBtn) {
+                cancelPhoneModalBtn.addEventListener('click', closePhoneModal);
+            }
+
+            if (modalNewPhone && phoneCmdSample) {
+                modalNewPhone.addEventListener('input', function () {
+                    const val = this.value.trim();
+                    phoneCmdSample.textContent = 'Change Phone ' + (val ? val : '[sdt mới]');
+                });
+            }
+
+            if (copyCmdBtn && phoneCmdSample && modalConfirmCommand) {
+                copyCmdBtn.addEventListener('click', function () {
+                    modalConfirmCommand.value = phoneCmdSample.textContent;
+                    modalConfirmCommand.focus();
+                });
+            }
+
+            // Click outside modal content to close
+            window.addEventListener('click', function (e) {
+                if (e.target === phoneModal) {
+                    closePhoneModal();
+                }
             });
         });
     </script>
