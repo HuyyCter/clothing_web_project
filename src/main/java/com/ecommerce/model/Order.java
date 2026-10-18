@@ -5,6 +5,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.ecommerce.dto.CategoryDTO;
+import com.ecommerce.dto.OrderDTO;
+import com.ecommerce.exception.BusinessException;
+import com.ecommerce.exception.NotFoundException;
+import com.ecommerce.repository.CategoryDB;
+import com.ecommerce.repository.OrderDB;
+import com.ecommerce.util.JpaUtil;
 
 @Entity
 @Table(name = "orders")
@@ -25,22 +32,21 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private OrderStatus status;
-    
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
-    public Order() {
-    }
+
+    public Order() {}
 
     public Order(User user) {
         this.user = user;
-        this.status = OrderStatus.PENDING; 
+        this.status = OrderStatus.PENDING;
         this.createdAt = LocalDateTime.now();
     }
-    
+
     @PrePersist
     protected void onCreate() {
         if (this.createdAt == null) {
@@ -88,7 +94,7 @@ public class Order {
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
-    
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -104,8 +110,78 @@ public class Order {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
+
     // ==========================================
     // METHODS
     // ==========================================
+    public static void updateStatus(int orderId, OrderStatus newStatus) {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+        EntityTransaction trans = em.getTransaction();
+
+        try {
+            trans.begin();
+
+            Order order = OrderDB.findById(em, orderId);
+            if (order == null) {
+                throw new NotFoundException("Không tìm thấy đơn hàng có id = " + orderId);
+            }
+            if (newStatus == null || !canSwitchStatusTo(order, newStatus)) {
+                throw new BusinessException("Không thể chuyển trạng thái đơn hàng từ " + order.getStatus() + " sang " + newStatus);
+            }
+
+            order.setStatus(newStatus);
+
+            if (newStatus == OrderStatus.CANCELLED) {
+                // TODO: chỉnh lại các ProductVariantStatus trong ProductVariant từ SOLD thành AVAILABEL
+            }
+
+            OrderDB.update(em, order);
+
+            trans.commit();
+        } catch (RuntimeException e) {
+            trans.rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public static List<OrderDTO> getAll() {
+        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
+
+        try {
+            List<OrderDTO> orders = new ArrayList<>();
+            for (Order order : OrderDB.findAll(em)) {
+                orders.add(OrderDTO.fromEntity(order));
+            }
+            return orders;
+        } catch (RuntimeException e) {
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    // ==========================================
+    // PRIVATE HELPERS
+    // ==========================================
+
+    // PENDING -> CONFIRMED -> SHIPPING -> DELIVERED (CANCELLED)
+    private static boolean canSwitchStatusTo(Order order, OrderStatus status) {
+        boolean canSwitch = false;
+        switch (order.getStatus()) {
+            case PENDING:
+                canSwitch = (status == OrderStatus.CONFIRMED || status == OrderStatus.CANCELLED);
+                break;
+            case CONFIRMED:
+                canSwitch = (status == OrderStatus.SHIPPING || status == OrderStatus.CANCELLED);
+                break;
+            case SHIPPING:
+                canSwitch = status == OrderStatus.DELIVERED;
+                break;
+            default:
+                break;
+        }
+        return canSwitch;
+    }
 }
