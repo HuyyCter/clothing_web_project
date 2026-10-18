@@ -701,3 +701,477 @@
     font-size: 12px;
     color: rgba(255, 255, 255, 0.3);
 }
+
+
+/* ==========================================================================
+   PROFILE PAGE STYLES (Module Profile) - Fashion Shop
+   ========================================================================== */
+
+.profile-page {
+    background-color: var(--bg-base);
+    min-height: calc(100vh - 60px);
+    padding: 32px 16px 64px;
+}
+
+.profile-container {
+    max-width: 1100px;
+    margin-inline: auto;
+}
+
+/* Breadcrumb */
+.profile-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.profile-breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.profile-breadcrumb a:hover {
+    color: var(--text-primary);
+}
+
+/* Alerts */
+.profile-alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-alert--error {
+    background-color: var(--error-bg-subtle);
+    color: var(--error-text);
+    border: var(--border-width-1) solid var(--error-border);
+}
+
+.profile-alert--success {
+    background-color: var(--success-bg-subtle);
+    color: var(--success-text);
+    border: var(--border-width-1) solid var(--success-border);
+}
+
+/* Layout Grid */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+@media (max-width: 860px) {
+    .profile-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* Sidebar Card */
+.profile-sidebar {
+    background-color: var(--bg-surface);
+    border: var(--border-width-1) solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.profile-user-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: var(--border-width-1) solid var(--border-default);
+    margin-bottom: 16px;
+}
+
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 9999px;
+    background-color: var(--primary-bg-subtle);
+    color: var(--primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-serif);
+    margin-bottom: 12px;
+    border: var(--border-width-2) solid var(--primary-border);
+}
+
+.profile-user-name {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.profile-user-email {
+    font-size: 13px;
+    color: var(--text-muted);
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.profile-role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    background-color: var(--secondary-bg-subtle);
+    color: var(--secondary-text);
+    border: var(--border-width-1) solid var(--secondary-border);
+}
+
+/* Nav Tabs */
+.profile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-nav__btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all var(--transition-fast);
+}
+
+.profile-nav__btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.profile-nav__btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-base);
+}
+
+.profile-nav__btn.is-active {
+    color: var(--primary-text);
+    background-color: var(--primary-bg-subtle);
+    font-weight: 600;
+}
+
+.profile-sidebar__logout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: var(--border-width-1) solid var(--border-default);
+    font-size: 14px;
+    color: var(--error-text);
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+}
+
+.profile-sidebar__logout:hover {
+    opacity: 0.8;
+}
+
+/* Content Card */
+.profile-content {
+    background-color: var(--bg-surface);
+    border: var(--border-width-1) solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+}
+
+.profile-section-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.profile-section-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: var(--border-width-1) solid var(--border-default);
+}
+
+/* Form Elements */
+.profile-form-group {
+    margin-bottom: 20px;
+}
+
+.profile-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.profile-label-badge {
+    font-size: 11px;
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.profile-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-primary);
+    background-color: var(--bg-base);
+    border: var(--border-width-1) solid var(--border-default);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.profile-input:focus {
+    border-color: var(--primary-bg);
+    box-shadow: 0 0 0 3px var(--primary-bg-subtle);
+    background-color: var(--bg-surface);
+}
+
+.profile-input[readonly],
+.profile-input:disabled {
+    background-color: var(--secondary-bg-subtle);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    border-color: var(--border-default);
+}
+
+.profile-helper {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.profile-password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.profile-password-wrapper .profile-input {
+    padding-right: 40px;
+}
+
+.profile-toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-toggle-password:hover {
+    color: var(--text-primary);
+}
+
+.profile-toggle-password svg {
+    width: 18px;
+    height: 18px;
+}
+
+.profile-btn-primary {
+    padding: 10px 24px;
+    border-radius: var(--radius-md);
+    background-color: var(--primary-bg);
+    color: var(--primary-text-on-solid);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.profile-btn-primary:hover {
+    background-color: var(--primary-bg-strong);
+}
+
+/* Address Section Styles */
+.address-list {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.address-card {
+    border: var(--border-width-1) solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    background-color: var(--bg-surface);
+    position: relative;
+    transition: border-color var(--transition-fast);
+}
+
+.address-card.is-default {
+    border-color: var(--primary-border);
+    background-color: var(--primary-bg-subtle);
+}
+
+.address-card__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.address-card__name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.address-card__phone {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.address-card__badge {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background-color: var(--primary-bg);
+    color: var(--primary-text-on-solid);
+}
+
+.address-card__body {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.address-empty {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: var(--bg-base);
+    border: var(--border-width-1) dashed var(--border-default);
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+}
+
+.address-empty svg {
+    width: 40px;
+    height: 40px;
+    color: var(--text-muted);
+    margin: 0 auto 12px;
+}
+
+.address-empty__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.address-empty__text {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.address-form-box {
+    background-color: var(--bg-base);
+    border: var(--border-width-1) solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.address-form-box__title {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 640px) {
+    .form-grid-2,
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.checkbox-container input {
+    accent-color: var(--primary-bg);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Tab Panels Display */
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.is-active {
+    display: block;
+}

@@ -34,6 +34,8 @@ change.
 - [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
 - [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký (đã cập nhật hiển thị errorMessage).
 - [x] `src/main/java/com/ecommerce/controller/RegisterServlet.java` — Servlet xử lý đăng ký tài khoản mới và tạo session đăng nhập tự động.
+- [x] `src/main/java/com/ecommerce/controller/ProfileServlet.java`, `dto/UserDTO.java`, `dto/AddressDTO.java`, `validator/ProfileValidator.java` — Xử lý hiển thị thông tin tài khoản, cập nhật họ tên, đổi mật khẩu (xác nhận mật khẩu cũ) và quản lý sổ địa chỉ.
+- [x] `src/main/webapp/WEB-INF/views/user/profile.jsp` — Giao diện hồ sơ cá nhân theo mô hình MVC, gồm thông tin cơ bản, form đổi mật khẩu và view hiển thị/thêm địa chỉ giao hàng.
 
 ## In Progress
 
