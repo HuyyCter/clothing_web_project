@@ -7,6 +7,8 @@ public class ProfileValidator {
     private static final int NAME_MAX_LENGTH = 255;
     private static final Pattern PASSWORD_PATTERN =
         Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
+    private static final Pattern PHONE_PATTERN =
+        Pattern.compile("^(?:\\+84|0)[35789][0-9]{8}$");
 
     public static String validateUpdateName(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) {
@@ -40,10 +42,27 @@ public class ProfileValidator {
         return null;
     }
 
-    private static final Pattern PHONE_PATTERN =
-        Pattern.compile("^(0|\\+84)[1-9][0-9]{8}$");
+    private static final Pattern EMAIL_PATTERN =
+        Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    public static String validateUpdatePhone(String currentPhone, String newPhone, String confirmCommand) {
+    public static String validateChangeEmail(String currentEmail, String newEmail, String currentPassword) {
+        if (currentPassword == null || currentPassword.isEmpty()) {
+            return "Vui lòng nhập mật khẩu hiện tại để xác thực.";
+        }
+        if (newEmail == null || newEmail.trim().isEmpty()) {
+            return "Vui lòng nhập địa chỉ email mới.";
+        }
+        String trimmedEmail = newEmail.trim();
+        if (!EMAIL_PATTERN.matcher(trimmedEmail).matches()) {
+            return "Định dạng email mới không hợp lệ.";
+        }
+        if (currentEmail != null && currentEmail.trim().equalsIgnoreCase(trimmedEmail)) {
+            return "Email mới không được trùng với email hiện tại.";
+        }
+        return null;
+    }
+
+    public static String validateUpdatePhone(String currentPhone, String newPhone) {
         if (newPhone == null || newPhone.trim().isEmpty()) {
             return "Số điện thoại mới không được để trống.";
         }
@@ -53,13 +72,6 @@ public class ProfileValidator {
         }
         if (currentPhone != null && currentPhone.trim().equals(trimmedPhone)) {
             return "Số điện thoại mới không được trùng với số điện thoại hiện tại.";
-        }
-        if (confirmCommand == null || confirmCommand.trim().isEmpty()) {
-            return "Vui lòng nhập dòng lệnh xác minh.";
-        }
-        String expectedCommand = "Change Phone " + trimmedPhone;
-        if (!confirmCommand.trim().equalsIgnoreCase(expectedCommand)) {
-            return "Dòng lệnh xác minh không chính xác. Bạn cần nhập đúng: " + expectedCommand;
         }
         return null;
     }

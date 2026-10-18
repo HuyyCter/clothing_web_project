@@ -17,15 +17,18 @@
                 <!-- Page Container -->
                 <div class="auth-page">
                     <div class="auth-card">
-                        <h2>Chào bạn</h2>
+                        <h2>Chào mừng trở lại</h2>
 
-                        <p>Vui lòng đăng nhập để tiếp tục (Hiện tại: <strong>
-                                <c:out value="${not empty sessionScope.logoName ? sessionScope.logoName : 'Guest'}" />
-                            </strong>)</p>
+                        <p>Vui lòng đăng nhập để tiếp tục mua sắm</p>
+
+                        <c:if test="${not empty requestScope.successMessage}">
+                            <div class="alert-success">
+                                <c:out value="${requestScope.successMessage}" />
+                            </div>
+                        </c:if>
 
                         <c:if test="${not empty requestScope.errorMessage}">
-                            <div
-                                style="color: #b91c1c; background-color: #fef2f2; border: 1px solid #fecaca; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+                            <div class="alert-error">
                                 <c:out value="${requestScope.errorMessage}" />
                             </div>
                         </c:if>
@@ -48,7 +51,7 @@
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        <svg class="eye-icon eye-hide" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="eye-icon eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                             <line x1="1" y1="1" x2="23" y2="23" />
                                         </svg>
@@ -56,9 +59,14 @@
                                 </div>
                             </div>
 
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="remember" name="remember" class="checkbox-input">
-                                <label for="remember" class="checkbox-text">Ghi nhớ tôi</label>
+                            <div class="auth-card__options">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="remember" name="remember" class="checkbox-input">
+                                    <label for="remember" class="checkbox-text">Ghi nhớ tôi</label>
+                                </div>
+                                <a href="${pageContext.request.contextPath}/forgot-password" class="form-link form-link--sm">
+                                    Quên mật khẩu?
+                                </a>
                             </div>
 
                             <button type="submit" class="submit-btn">Đăng nhập</button>
@@ -66,13 +74,11 @@
 
 
                         <!-- Links -->
-                        <div
-                            style="text-align: center; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div class="auth-card__footer-links">
                             <a href="${pageContext.request.contextPath}/register.jsp" class="form-link">
                                 Chưa có tài khoản? Đăng ký
                             </a>
-                            <a href="${pageContext.request.contextPath}/index.jsp" class="form-link"
-                                style="color: #64748b; font-size: 0.875rem;">
+                            <a href="${pageContext.request.contextPath}/index.jsp" class="form-link auth-card__link-muted">
                                 ← Quay lại trang chủ
                             </a>
                         </div>

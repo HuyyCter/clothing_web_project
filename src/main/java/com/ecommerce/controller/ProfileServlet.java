@@ -2,6 +2,7 @@ package com.ecommerce.controller;
 
 import com.ecommerce.dto.AddressDTO;
 import com.ecommerce.dto.OrderDTO;
+import com.ecommerce.dto.OtpSessionData;
 import com.ecommerce.dto.UserDTO;
 import com.ecommerce.model.Address;
 import com.ecommerce.model.Order;
@@ -10,6 +11,7 @@ import com.ecommerce.model.User;
 import com.ecommerce.repository.OrderDB;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.util.JpaUtil;
+import com.ecommerce.util.MailUtil;
 import com.ecommerce.util.PasswordUtil;
 import com.ecommerce.validator.ProfileValidator;
 import jakarta.persistence.EntityManager;
@@ -23,7 +25,9 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @WebServlet("/profile")
@@ -49,6 +53,18 @@ public class ProfileServlet extends HttpServlet {
 
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if ("cancelChangeEmailOtp".equalsIgnoreCase(action)) {
+            session.removeAttribute("changeEmailOtpData");
+            response.sendRedirect(request.getContextPath() + "/profile");
+            return;
+        }
+        if ("cancelChangePhoneOtp".equalsIgnoreCase(action)) {
+            session.removeAttribute("changePhoneOtpData");
+            response.sendRedirect(request.getContextPath() + "/profile");
             return;
         }
 
@@ -143,8 +159,24 @@ public class ProfileServlet extends HttpServlet {
                 handleSetDefaultAddress(request, em, userId);
             } else if ("cancelOrder".equalsIgnoreCase(action)) {
                 handleCancelOrder(request, em, userId);
-            } else if ("updatePhone".equalsIgnoreCase(action)) {
-                handleUpdatePhone(request, session, em, user, userId);
+            } else if ("requestChangeEmail".equalsIgnoreCase(action)) {
+                handleRequestChangeEmail(request, session, em, user, userId);
+            } else if ("confirmChangeEmail".equalsIgnoreCase(action)) {
+                handleConfirmChangeEmail(request, session, em, user, userId);
+            } else if ("resendChangeEmailOtp".equalsIgnoreCase(action)) {
+                handleResendChangeEmailOtp(request, session);
+            } else if ("cancelChangeEmailOtp".equalsIgnoreCase(action)) {
+                session.removeAttribute("changeEmailOtpData");
+                request.setAttribute("activeTab", "profile");
+            } else if ("requestChangePhone".equalsIgnoreCase(action) || "updatePhone".equalsIgnoreCase(action)) {
+                handleRequestChangePhone(request, session, em, user, userId);
+            } else if ("confirmChangePhone".equalsIgnoreCase(action)) {
+                handleConfirmChangePhone(request, session, em, user, userId);
+            } else if ("resendChangePhoneOtp".equalsIgnoreCase(action)) {
+                handleResendChangePhoneOtp(request, session, user);
+            } else if ("cancelChangePhoneOtp".equalsIgnoreCase(action)) {
+                session.removeAttribute("changePhoneOtpData");
+                request.setAttribute("activeTab", "profile");
             }
 
             populateProfileData(em, userId, session, request);
@@ -189,15 +221,119 @@ public class ProfileServlet extends HttpServlet {
         request.setAttribute("successMessage", "Cập nhật họ và tên thành công!");
     }
 
-    private void handleUpdatePhone(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
-        String newPhone = request.getParameter("newPhone");
-        String confirmCommand = request.getParameter("confirmCommand");
+    // =========================================================================
+    // THAY ĐỔI EMAIL VỚI MẬT KHẨU & OTP
+    // =========================================================================
+    private void handleRequestChangeEmail(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
+        String currentPassword = request.getParameter("currentPassword");
+        String newEmail = request.getParameter("newEmail");
 
         request.setAttribute("activeTab", "profile");
+        request.setAttribute("openEmailModal", true);
 
-        String error = ProfileValidator.validateUpdatePhone(user.getPhone(), newPhone, confirmCommand);
+        String error = ProfileValidator.validateChangeEmail(user.getEmail(), newEmail, currentPassword);
         if (error != null) {
-            request.setAttribute("errorMessage", error);
+            request.setAttribute("changeEmailError", error);
+            return;
+        }
+
+        if (!PasswordUtil.checkPassword(currentPassword, user.getPasswordHash())) {
+            request.setAttribute("changeEmailError", "Mật khẩu hiện tại không chính xác.");
+            return;
+        }
+
+        if (em != null) {
+            UserRepository userRepo = new UserRepository(em);
+            Optional<User> existingUser = userRepo.findByEmail(em, newEmail.trim());
+            if (existingUser.isPresent() && existingUser.get().getId() != userId) {
+                request.setAttribute("changeEmailError", "Địa chỉ email này đã được sử dụng bởi một tài khoản khác.");
+                return;
+            }
+        }
+
+        // Tạo OTP gửi về email MỚI để kiểm tra quyền sở hữu email mới
+        Map<String, String> payload = new HashMap<>();
+        payload.put("newEmail", newEmail.trim());
+
+        OtpSessionData otpData = OtpSessionData.create(newEmail.trim(), "Xác thực thay đổi Email tài khoản", payload);
+        boolean sent = MailUtil.sendOtpEmail(newEmail.trim(), otpData.getCode(), "xác thực thay đổi địa chỉ email tài khoản Fashion Shop");
+        if (!sent) {
+            request.setAttribute("changeEmailError", "Không thể gửi email OTP tới " + newEmail.trim() + ". Vui lòng kiểm tra lại địa chỉ email.");
+            return;
+        }
+
+        session.setAttribute("changeEmailOtpData", otpData);
+        request.setAttribute("changeEmailSuccess", "Mã xác thực OTP gồm 6 chữ số đã được gửi tới email mới: " + newEmail.trim() + ".");
+    }
+
+    private void handleConfirmChangeEmail(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
+        request.setAttribute("activeTab", "profile");
+        OtpSessionData otpData = (OtpSessionData) session.getAttribute("changeEmailOtpData");
+        if (otpData == null) {
+            request.setAttribute("errorMessage", "Phiên xác thực đổi email đã kết thúc hoặc bị hủy.");
+            return;
+        }
+
+        String otpCode = request.getParameter("otpCode");
+        String verifyError = otpData.verify(otpCode);
+        if (verifyError != null) {
+            request.setAttribute("changeEmailError", verifyError);
+            request.setAttribute("openEmailModal", true);
+            return;
+        }
+
+        String newEmail = otpData.getPayload().get("newEmail");
+        if (em != null) {
+            em.getTransaction().begin();
+            user.setEmail(newEmail);
+            em.merge(user);
+            em.getTransaction().commit();
+        } else {
+            user.setEmail(newEmail);
+        }
+
+        session.removeAttribute("changeEmailOtpData");
+        session.setAttribute("user", user);
+        request.setAttribute("successMessage", "Đã thay đổi email tài khoản thành công thành: " + newEmail);
+    }
+
+    private void handleResendChangeEmailOtp(HttpServletRequest request, HttpSession session) {
+        request.setAttribute("activeTab", "profile");
+        OtpSessionData otpData = (OtpSessionData) session.getAttribute("changeEmailOtpData");
+        if (otpData == null) {
+            request.setAttribute("errorMessage", "Phiên xác thực đổi email đã kết thúc.");
+            return;
+        }
+
+        if (!otpData.canResend()) {
+            request.setAttribute("openEmailModal", true);
+            request.setAttribute("changeEmailError", "Vui lòng đợi thêm " + otpData.getResendCooldownRemainingSeconds() + " giây trước khi gửi lại mã OTP.");
+            return;
+        }
+
+        otpData.refreshCode();
+        String newEmail = otpData.getPayload().get("newEmail");
+        boolean sent = MailUtil.sendOtpEmail(newEmail, otpData.getCode(), "xác thực thay đổi địa chỉ email tài khoản Fashion Shop");
+        request.setAttribute("openEmailModal", true);
+        if (sent) {
+            request.setAttribute("changeEmailSuccess", "Đã gửi lại mã OTP mới đến " + newEmail);
+        } else {
+            request.setAttribute("changeEmailError", "Không thể gửi lại email OTP. Vui lòng thử lại sau.");
+        }
+    }
+
+    // =========================================================================
+    // THAY ĐỔI SỐ ĐIỆN THOẠI VỚI OTP QUA EMAIL (KHÔNG DÙNG SMS)
+    // =========================================================================
+    private void handleRequestChangePhone(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
+        String newPhone = request.getParameter("newPhone");
+
+        request.setAttribute("activeTab", "profile");
+        request.setAttribute("openPhoneModal", true);
+
+        String error = ProfileValidator.validateUpdatePhone(user.getPhone(), newPhone);
+        if (error != null) {
+            request.setAttribute("changePhoneError", error);
             return;
         }
 
@@ -205,20 +341,80 @@ public class ProfileServlet extends HttpServlet {
             UserRepository userRepo = new UserRepository(em);
             Optional<User> existingUser = userRepo.findByPhone(em, newPhone.trim());
             if (existingUser.isPresent() && existingUser.get().getId() != userId) {
-                request.setAttribute("errorMessage", "Số điện thoại này đã được sử dụng bởi một tài khoản khác.");
+                request.setAttribute("changePhoneError", "Số điện thoại này đã được sử dụng bởi một tài khoản khác.");
                 return;
             }
+        }
 
+        // Tạo OTP và gửi về EMAIL hiện tại của user (do không có SMS)
+        Map<String, String> payload = new HashMap<>();
+        payload.put("newPhone", newPhone.trim());
+
+        OtpSessionData otpData = OtpSessionData.create(user.getEmail(), "Xác thực thay đổi số điện thoại", payload);
+        boolean sent = MailUtil.sendOtpEmail(user.getEmail(), otpData.getCode(), "xác thực thay đổi số điện thoại tài khoản Fashion Shop sang số " + newPhone.trim());
+        if (!sent) {
+            request.setAttribute("changePhoneError", "Không thể gửi email OTP tới " + user.getEmail() + ". Vui lòng thử lại sau.");
+            return;
+        }
+
+        session.setAttribute("changePhoneOtpData", otpData);
+        request.setAttribute("changePhoneSuccess", "Mã xác thực OTP gồm 6 chữ số đã được gửi tới email của bạn (" + user.getEmail() + ").");
+    }
+
+    private void handleConfirmChangePhone(HttpServletRequest request, HttpSession session, EntityManager em, User user, int userId) {
+        request.setAttribute("activeTab", "profile");
+        OtpSessionData otpData = (OtpSessionData) session.getAttribute("changePhoneOtpData");
+        if (otpData == null) {
+            request.setAttribute("errorMessage", "Phiên xác thực đổi số điện thoại đã kết thúc hoặc bị hủy.");
+            return;
+        }
+
+        String otpCode = request.getParameter("otpCode");
+        String verifyError = otpData.verify(otpCode);
+        if (verifyError != null) {
+            request.setAttribute("changePhoneError", verifyError);
+            request.setAttribute("openPhoneModal", true);
+            return;
+        }
+
+        String newPhone = otpData.getPayload().get("newPhone");
+        if (em != null) {
             em.getTransaction().begin();
-            user.setPhone(newPhone.trim());
+            user.setPhone(newPhone);
             em.merge(user);
             em.getTransaction().commit();
         } else {
-            user.setPhone(newPhone.trim());
+            user.setPhone(newPhone);
         }
 
+        session.removeAttribute("changePhoneOtpData");
         session.setAttribute("user", user);
-        request.setAttribute("successMessage", "Thay đổi số điện thoại thành công thành: " + newPhone.trim());
+        request.setAttribute("successMessage", "Thay đổi số điện thoại thành công thành: " + newPhone);
+    }
+
+    private void handleResendChangePhoneOtp(HttpServletRequest request, HttpSession session, User user) {
+        request.setAttribute("activeTab", "profile");
+        OtpSessionData otpData = (OtpSessionData) session.getAttribute("changePhoneOtpData");
+        if (otpData == null) {
+            request.setAttribute("errorMessage", "Phiên xác thực đổi số điện thoại đã kết thúc.");
+            return;
+        }
+
+        if (!otpData.canResend()) {
+            request.setAttribute("openPhoneModal", true);
+            request.setAttribute("changePhoneError", "Vui lòng đợi thêm " + otpData.getResendCooldownRemainingSeconds() + " giây trước khi gửi lại mã OTP.");
+            return;
+        }
+
+        otpData.refreshCode();
+        String newPhone = otpData.getPayload().get("newPhone");
+        boolean sent = MailUtil.sendOtpEmail(user.getEmail(), otpData.getCode(), "xác thực thay đổi số điện thoại tài khoản Fashion Shop sang số " + newPhone);
+        request.setAttribute("openPhoneModal", true);
+        if (sent) {
+            request.setAttribute("changePhoneSuccess", "Đã gửi lại mã OTP mới đến email " + user.getEmail());
+        } else {
+            request.setAttribute("changePhoneError", "Không thể gửi lại email OTP. Vui lòng thử lại sau.");
+        }
     }
 
     private void handleChangePassword(HttpServletRequest request, HttpSession session, EntityManager em, User user) {

@@ -72,7 +72,7 @@
                 <span>/</span>
                 <span>Tài khoản</span>
                 <span>/</span>
-                <span style="color: var(--text-primary); font-weight: 500;">Hồ sơ</span>
+                <span class="profile-breadcrumb__current">Hồ sơ</span>
             </nav>
 
             <!-- Alerts -->
@@ -175,30 +175,30 @@
                             <input type="hidden" name="action" value="updateName">
 
                             <div class="profile-form-group">
-                                <label for="fullName" class="profile-label">
-                                    Họ và tên
-                                    <span class="profile-label-badge" style="color: var(--primary-bg);">Có thể thay đổi</span>
-                                </label>
+                                <label for="fullName" class="profile-label">Họ và tên</label>
                                 <input type="text" id="fullName" name="fullName" class="profile-input" 
                                        value="<c:out value='${userDTO.fullName}' />" required maxlength="255">
                                 <div class="profile-helper">Tên hiển thị trên đơn hàng và thanh điều hướng.</div>
                             </div>
 
                             <div class="profile-form-group">
-                                <label for="email" class="profile-label">
-                                    Địa chỉ Email
-                                    <span class="profile-label-badge">Cố định</span>
-                                </label>
-                                <input type="email" id="email" class="profile-input" 
-                                       value="<c:out value='${userDTO.email}' />" readonly disabled>
-                                <div class="profile-helper">Email đăng nhập tài khoản cố định và không thể thay đổi.</div>
+                                <label for="email" class="profile-label">Địa chỉ Email</label>
+                                <div class="phone-display-group">
+                                    <input type="email" id="email" class="profile-input" 
+                                           value="<c:out value='${userDTO.email}' />" readonly>
+                                    <button type="button" class="btn-change-phone" id="openEmailModalBtn" title="Thay đổi địa chỉ email">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                            <polyline points="22,6 12,13 2,6" />
+                                        </svg>
+                                        Đổi Email
+                                    </button>
+                                </div>
+                                <div class="profile-helper">Email dùng để đăng nhập và nhận mã OTP xác thực bảo mật tài khoản.</div>
                             </div>
 
                             <div class="profile-form-group">
-                                <label for="phone" class="profile-label">
-                                    Số điện thoại
-                                    <span class="profile-label-badge" style="color: var(--primary-bg);">Có thể đổi kèm xác minh</span>
-                                </label>
+                                <label for="phone" class="profile-label">Số điện thoại</label>
                                 <div class="phone-display-group">
                                     <input type="text" id="phone" class="profile-input" 
                                            value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa cập nhật\"}' />" readonly>
@@ -242,7 +242,7 @@
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        <svg class="eye-hide" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                             <line x1="1" y1="1" x2="23" y2="23" />
                                         </svg>
@@ -260,7 +260,7 @@
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        <svg class="eye-hide" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                             <line x1="1" y1="1" x2="23" y2="23" />
                                         </svg>
@@ -279,7 +279,7 @@
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                                             <circle cx="12" cy="12" r="3" />
                                         </svg>
-                                        <svg class="eye-hide" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <svg class="eye-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                                             <line x1="1" y1="1" x2="23" y2="23" />
                                         </svg>
@@ -332,7 +332,7 @@
                                             <!-- Các nút thao tác Address CRUD -->
                                             <div class="address-card__actions">
                                                 <c:if test="${not addr.isDefault}">
-                                                    <form action="${ctx}/profile" method="post" style="display:inline;">
+                                                    <form action="${ctx}/profile" method="post" class="profile-form-inline">
                                                         <input type="hidden" name="action" value="setDefaultAddress">
                                                         <input type="hidden" name="addressId" value="${addr.id}">
                                                         <button type="submit" class="address-btn address-btn--default">
@@ -353,7 +353,7 @@
                                                     ✎ Chỉnh sửa
                                                 </button>
 
-                                                <form action="${ctx}/profile" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');">
+                                                <form action="${ctx}/profile" method="post" class="profile-form-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');">
                                                     <input type="hidden" name="action" value="deleteAddress">
                                                     <input type="hidden" name="addressId" value="${addr.id}">
                                                     <button type="submit" class="address-btn address-btn--delete">
@@ -464,7 +464,7 @@
                                     </div>
                                     <h3 class="profile-empty-orders__title">Bạn chưa có đơn hàng nào</h3>
                                     <p class="profile-empty-orders__desc">Hãy khám phá bộ sưu tập trang phục thời trang mới nhất và chọn cho mình phong cách ưng ý nhé!</p>
-                                    <a href="${ctx}/" class="profile-btn-primary" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                                    <a href="${ctx}/" class="profile-btn-primary profile-btn-shopping">
                                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="9" cy="21" r="1" />
                                             <circle cx="20" cy="21" r="1" />
@@ -600,7 +600,7 @@
 
                                                 <div class="order-card__action-buttons">
                                                     <c:if test="${order.canCancel}">
-                                                        <form action="${ctx}/profile" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng ${order.orderCode} không?');">
+                                                        <form action="${ctx}/profile" method="post" class="profile-form-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng ${order.orderCode} không?');">
                                                             <input type="hidden" name="action" value="cancelOrder">
                                                             <input type="hidden" name="orderId" value="${order.id}">
                                                             <button type="submit" class="order-btn order-btn--cancel">
@@ -696,58 +696,174 @@
         </div>
     </div>
 
+    <!-- MODAL THAY ĐỔI EMAIL -->
+    <div id="changeEmailModal" class="profile-modal ${openEmailModal or not empty sessionScope.changeEmailOtpData ? 'is-open' : ''}" aria-hidden="${openEmailModal or not empty sessionScope.changeEmailOtpData ? 'false' : 'true'}">
+        <div class="profile-modal__content">
+            <div class="profile-modal__header">
+                <h3 class="profile-modal__title">Thay Đổi Địa Chỉ Email</h3>
+                <button type="button" class="profile-modal__close" id="closeEmailModalBtn" aria-label="Đóng">&times;</button>
+            </div>
+
+            <c:if test="${not empty changeEmailError}">
+                <div class="modal-error-box">
+                    <c:out value="${changeEmailError}" />
+                </div>
+            </c:if>
+
+            <c:if test="${not empty changeEmailSuccess}">
+                <div class="modal-info-box">
+                    <c:out value="${changeEmailSuccess}" />
+                </div>
+            </c:if>
+
+            <c:choose>
+                <c:when test="${not empty sessionScope.changeEmailOtpData}">
+                    <!-- BƯỚC 2: NHẬP OTP XÁC NHẬN ĐỔI EMAIL -->
+                    <div class="profile-modal-notice">
+                        Mã OTP gồm 6 chữ số đã được gửi đến email mới: <strong><c:out value="${sessionScope.changeEmailOtpData.targetEmail}" /></strong>. Vui lòng nhập mã để hoàn tất.
+                    </div>
+
+                    <div class="modal-otp-meta">
+                        <div>Hiệu lực còn: <span id="emailOtpCountdown" class="modal-otp-timer">--:--</span></div>
+                        <div class="modal-otp-attempts">Lần thử: <strong><c:out value="${sessionScope.changeEmailOtpData.attemptsLeft}" />/3</strong></div>
+                    </div>
+
+                    <form action="${ctx}/profile" method="post" id="confirmEmailOtpForm">
+                        <input type="hidden" name="action" value="confirmChangeEmail">
+
+                        <div class="profile-form-group">
+                            <label for="emailOtpCode" class="profile-label">Mã OTP (6 chữ số)</label>
+                            <input type="text" id="emailOtpCode" name="otpCode" class="profile-input modal-otp-input" 
+                                   placeholder="000000" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                        </div>
+
+                        <div class="profile-modal__footer">
+                            <a href="${ctx}/profile?action=cancelChangeEmailOtp" class="btn-secondary profile-modal-btn-cancel">Hủy</a>
+                            <button type="submit" class="profile-btn-primary" id="btnConfirmEmailOtp">Xác nhận đổi Email</button>
+                        </div>
+                    </form>
+
+                    <form action="${ctx}/profile" method="post">
+                        <input type="hidden" name="action" value="resendChangeEmailOtp">
+                        <button type="submit" class="modal-otp-resend-btn" id="resendEmailOtpBtn">Gửi lại mã OTP mới</button>
+                    </form>
+                </c:when>
+
+                <c:otherwise>
+                    <!-- BƯỚC 1: NHẬP MẬT KHẨU HIỆN TẠI VÀ EMAIL MỚI -->
+                    <form action="${ctx}/profile" method="post" id="requestEmailForm">
+                        <input type="hidden" name="action" value="requestChangeEmail">
+
+                        <div class="profile-form-group">
+                            <label class="profile-label">Email hiện tại</label>
+                            <input type="email" class="profile-input" value="<c:out value='${userDTO.email}' />" readonly disabled>
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label for="currentPasswordForEmail" class="profile-label">Mật khẩu hiện tại <span class="profile-required-mark">*</span></label>
+                            <input type="password" id="currentPasswordForEmail" name="currentPassword" class="profile-input" placeholder="Nhập mật khẩu hiện tại của bạn" required>
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label for="newEmail" class="profile-label">Địa chỉ Email mới <span class="profile-required-mark">*</span></label>
+                            <input type="email" id="newEmail" name="newEmail" class="profile-input" placeholder="example@domain.com" required>
+                            <div class="profile-helper">Hệ thống sẽ gửi mã OTP gồm 6 chữ số đến email mới này để xác thực.</div>
+                        </div>
+
+                        <div class="profile-modal__footer">
+                            <button type="button" class="btn-secondary" id="cancelEmailModalBtn">Hủy</button>
+                            <button type="submit" class="profile-btn-primary">Gửi mã OTP xác nhận</button>
+                        </div>
+                    </form>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+
     <!-- MODAL THAY ĐỔI SỐ ĐIỆN THOẠI -->
-    <div id="changePhoneModal" class="profile-modal" aria-hidden="true">
+    <div id="changePhoneModal" class="profile-modal ${openPhoneModal or not empty sessionScope.changePhoneOtpData ? 'is-open' : ''}" aria-hidden="${openPhoneModal or not empty sessionScope.changePhoneOtpData ? 'false' : 'true'}">
         <div class="profile-modal__content">
             <div class="profile-modal__header">
                 <h3 class="profile-modal__title">Thay Đổi Số Điện Thoại</h3>
                 <button type="button" class="profile-modal__close" id="closePhoneModalBtn" aria-label="Đóng">&times;</button>
             </div>
 
-            <form action="${ctx}/profile" method="post" id="changePhoneForm">
-                <input type="hidden" name="action" value="updatePhone">
-
-                <div class="profile-form-group">
-                    <label class="profile-label">Số điện thoại hiện tại</label>
-                    <input type="text" class="profile-input" value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa có SĐT\"}' />" readonly disabled>
+            <c:if test="${not empty changePhoneError}">
+                <div class="modal-error-box">
+                    <c:out value="${changePhoneError}" />
                 </div>
+            </c:if>
 
-                <div class="profile-form-group">
-                    <label for="modalNewPhone" class="profile-label">
-                        Số điện thoại mới
-                        <span style="color:var(--error-text);">*</span>
-                    </label>
-                    <input type="tel" id="modalNewPhone" name="newPhone" class="profile-input" placeholder="Ví dụ: 0912345678" required maxlength="15">
-                    <div class="profile-helper">Nhập 10 chữ số (bắt đầu bằng 03, 05, 07, 08, 09 hoặc +84...).</div>
+            <c:if test="${not empty changePhoneSuccess}">
+                <div class="modal-info-box">
+                    <c:out value="${changePhoneSuccess}" />
                 </div>
+            </c:if>
 
-                <div class="phone-verify-box">
-                    <div class="phone-verify-box__header">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
-                        Xác minh an toàn: Nhập chính xác dòng lệnh sau
+            <c:choose>
+                <c:when test="${not empty sessionScope.changePhoneOtpData}">
+                    <!-- BƯỚC 2: NHẬP OTP XÁC NHẬN ĐỔI SĐT (GỬI VỀ EMAIL CỦA TÀI KHOẢN) -->
+                    <div class="profile-modal-notice">
+                        Mã OTP đã được gửi về email tài khoản: <strong><c:out value="${userDTO.email}" /></strong> để xác nhận thay đổi số điện thoại thành: <strong><c:out value="${sessionScope.changePhoneOtpData.payload['newPhone']}" /></strong>.
                     </div>
-                    <div class="phone-verify-command">
-                        <code id="phoneCmdSample">Change Phone [sdt mới]</code>
-                        <button type="button" class="btn-copy-cmd" id="copyCmdBtn" title="Sao chép lệnh vào ô nhập">Sao chép</button>
+
+                    <div class="modal-otp-meta">
+                        <div>Hiệu lực còn: <span id="phoneOtpCountdown" class="modal-otp-timer">--:--</span></div>
+                        <div class="modal-otp-attempts">Lần thử: <strong><c:out value="${sessionScope.changePhoneOtpData.attemptsLeft}" />/3</strong></div>
                     </div>
-                    <div class="phone-verify-box__note">Để xác nhận thao tác, bạn bắt buộc phải nhập đúng dòng lệnh trên vào ô xác nhận bên dưới.</div>
-                </div>
 
-                <div class="profile-form-group" style="margin-top: 16px;">
-                    <label for="modalConfirmCommand" class="profile-label">
-                        Dòng lệnh xác minh
-                        <span style="color:var(--error-text);">*</span>
-                    </label>
-                    <input type="text" id="modalConfirmCommand" name="confirmCommand" class="profile-input" placeholder="Change Phone [sdt mới]" required autocomplete="off">
-                </div>
+                    <form action="${ctx}/profile" method="post" id="confirmPhoneOtpForm">
+                        <input type="hidden" name="action" value="confirmChangePhone">
 
-                <div class="profile-modal__footer">
-                    <button type="button" class="btn-secondary" id="cancelPhoneModalBtn">Hủy</button>
-                    <button type="submit" class="profile-btn-primary">Xác nhận thay đổi SĐT</button>
-                </div>
-            </form>
+                        <div class="profile-form-group">
+                            <label for="phoneOtpCode" class="profile-label">Mã OTP (6 chữ số)</label>
+                            <input type="text" id="phoneOtpCode" name="otpCode" class="profile-input modal-otp-input" 
+                                   placeholder="000000" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                        </div>
+
+                        <div class="profile-modal__footer">
+                            <a href="${ctx}/profile?action=cancelChangePhoneOtp" class="btn-secondary profile-modal-btn-cancel">Hủy</a>
+                            <button type="submit" class="profile-btn-primary" id="btnConfirmPhoneOtp">Xác nhận đổi SĐT</button>
+                        </div>
+                    </form>
+
+                    <form action="${ctx}/profile" method="post">
+                        <input type="hidden" name="action" value="resendChangePhoneOtp">
+                        <button type="submit" class="modal-otp-resend-btn" id="resendPhoneOtpBtn">Gửi lại mã OTP mới</button>
+                    </form>
+                </c:when>
+
+                <c:otherwise>
+                    <!-- BƯỚC 1: NHẬP SỐ ĐIỆN THOẠI MỚI -->
+                    <form action="${ctx}/profile" method="post" id="changePhoneForm">
+                        <input type="hidden" name="action" value="requestChangePhone">
+
+                        <div class="profile-form-group">
+                            <label class="profile-label">Số điện thoại hiện tại</label>
+                            <input type="text" class="profile-input" value="<c:out value='${not empty userDTO.phone ? userDTO.phone : \"Chưa có SĐT\"}' />" readonly disabled>
+                        </div>
+
+                        <div class="profile-form-group">
+                            <label for="modalNewPhone" class="profile-label">
+                                Số điện thoại mới
+                                <span class="profile-required-mark">*</span>
+                            </label>
+                            <input type="tel" id="modalNewPhone" name="newPhone" class="profile-input" placeholder="Ví dụ: 0912345678" required maxlength="15">
+                            <div class="profile-helper">Nhập 10 chữ số (bắt đầu bằng 03, 05, 07, 08, 09 hoặc +84...).</div>
+                        </div>
+
+                        <div class="profile-modal-notice-box">
+                            <div class="profile-modal-notice-title">Xác thực bảo mật qua Email</div>
+                            Hệ thống không gửi tin nhắn SMS. Mã xác thực OTP sẽ được gửi về hộp thư Email của bạn (<strong class="profile-modal-notice-target"><c:out value="${userDTO.email}" /></strong>) để xác nhận.
+                        </div>
+
+                        <div class="profile-modal__footer">
+                            <button type="button" class="btn-secondary" id="cancelPhoneModalBtn">Hủy</button>
+                            <button type="submit" class="profile-btn-primary">Gửi mã xác nhận</button>
+                        </div>
+                    </form>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 
@@ -892,60 +1008,151 @@
                 });
             });
 
+            // Change Email Modal
+            const emailModal = document.getElementById('changeEmailModal');
+            const openEmailModalBtn = document.getElementById('openEmailModalBtn');
+            const closeEmailModalBtn = document.getElementById('closeEmailModalBtn');
+            const cancelEmailModalBtn = document.getElementById('cancelEmailModalBtn');
+
+            function openEmailModal() {
+                if (emailModal) {
+                    emailModal.classList.add('is-open');
+                    emailModal.setAttribute('aria-hidden', 'false');
+                }
+            }
+
+            function closeEmailModal() {
+                if (emailModal) {
+                    emailModal.classList.remove('is-open');
+                    emailModal.setAttribute('aria-hidden', 'true');
+                }
+            }
+
+            if (openEmailModalBtn) openEmailModalBtn.addEventListener('click', openEmailModal);
+            if (closeEmailModalBtn) closeEmailModalBtn.addEventListener('click', closeEmailModal);
+            if (cancelEmailModalBtn) cancelEmailModalBtn.addEventListener('click', closeEmailModal);
+
             // Change Phone Modal
             const phoneModal = document.getElementById('changePhoneModal');
             const openPhoneModalBtn = document.getElementById('openPhoneModalBtn');
             const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
             const cancelPhoneModalBtn = document.getElementById('cancelPhoneModalBtn');
-            const modalNewPhone = document.getElementById('modalNewPhone');
-            const phoneCmdSample = document.getElementById('phoneCmdSample');
-            const copyCmdBtn = document.getElementById('copyCmdBtn');
-            const modalConfirmCommand = document.getElementById('modalConfirmCommand');
 
             function openPhoneModal() {
-                if (modalNewPhone) modalNewPhone.value = '';
-                if (modalConfirmCommand) modalConfirmCommand.value = '';
-                if (phoneCmdSample) phoneCmdSample.textContent = 'Change Phone [sdt mới]';
-                phoneModal.classList.add('is-open');
-                phoneModal.setAttribute('aria-hidden', 'false');
-                if (modalNewPhone) modalNewPhone.focus();
+                if (phoneModal) {
+                    phoneModal.classList.add('is-open');
+                    phoneModal.setAttribute('aria-hidden', 'false');
+                }
             }
 
             function closePhoneModal() {
-                phoneModal.classList.remove('is-open');
-                phoneModal.setAttribute('aria-hidden', 'true');
+                if (phoneModal) {
+                    phoneModal.classList.remove('is-open');
+                    phoneModal.setAttribute('aria-hidden', 'true');
+                }
             }
 
-            if (openPhoneModalBtn) {
-                openPhoneModalBtn.addEventListener('click', openPhoneModal);
-            }
-            if (closePhoneModalBtn) {
-                closePhoneModalBtn.addEventListener('click', closePhoneModal);
-            }
-            if (cancelPhoneModalBtn) {
-                cancelPhoneModalBtn.addEventListener('click', closePhoneModal);
-            }
-
-            if (modalNewPhone && phoneCmdSample) {
-                modalNewPhone.addEventListener('input', function () {
-                    const val = this.value.trim();
-                    phoneCmdSample.textContent = 'Change Phone ' + (val ? val : '[sdt mới]');
-                });
-            }
-
-            if (copyCmdBtn && phoneCmdSample && modalConfirmCommand) {
-                copyCmdBtn.addEventListener('click', function () {
-                    modalConfirmCommand.value = phoneCmdSample.textContent;
-                    modalConfirmCommand.focus();
-                });
-            }
+            if (openPhoneModalBtn) openPhoneModalBtn.addEventListener('click', openPhoneModal);
+            if (closePhoneModalBtn) closePhoneModalBtn.addEventListener('click', closePhoneModal);
+            if (cancelPhoneModalBtn) cancelPhoneModalBtn.addEventListener('click', closePhoneModal);
 
             // Click outside modal content to close
             window.addEventListener('click', function (e) {
+                if (e.target === emailModal) {
+                    closeEmailModal();
+                }
                 if (e.target === phoneModal) {
                     closePhoneModal();
                 }
             });
+
+            // Countdown Timer for Email OTP
+            <c:if test="${not empty sessionScope.changeEmailOtpData}">
+            (function() {
+                var remaining = <c:out value="${sessionScope.changeEmailOtpData.remainingSeconds}" default="120" />;
+                var timerEl = document.getElementById('emailOtpCountdown');
+                var submitBtn = document.getElementById('btnConfirmEmailOtp');
+                function tick() {
+                    if (!timerEl) return;
+                    if (remaining <= 0) {
+                        timerEl.textContent = 'Hết hạn';
+                        timerEl.style.color = '#b91c1c';
+                        if (submitBtn) submitBtn.disabled = true;
+                        return;
+                    }
+                    var m = Math.floor(remaining / 60);
+                    var s = remaining % 60;
+                    timerEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                    remaining--;
+                    setTimeout(tick, 1000);
+                }
+                tick();
+
+                var resendCooldown = <c:out value="${sessionScope.changeEmailOtpData.resendCooldownRemainingSeconds}" default="30" />;
+                var resendBtn = document.getElementById('resendEmailOtpBtn');
+                function updateResendCooldown() {
+                    if (!resendBtn) return;
+                    if (resendCooldown <= 0) {
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = "Gửi lại mã OTP mới";
+                        resendBtn.style.opacity = "1";
+                        resendBtn.style.cursor = "pointer";
+                        return;
+                    }
+                    resendBtn.disabled = true;
+                    resendBtn.textContent = "Gửi lại mã OTP mới (" + resendCooldown + "s)";
+                    resendBtn.style.opacity = "0.6";
+                    resendBtn.style.cursor = "not-allowed";
+                    resendCooldown--;
+                    setTimeout(updateResendCooldown, 1000);
+                }
+                updateResendCooldown();
+            })();
+            </c:if>
+
+            // Countdown Timer for Phone OTP
+            <c:if test="${not empty sessionScope.changePhoneOtpData}">
+            (function() {
+                var remaining = <c:out value="${sessionScope.changePhoneOtpData.remainingSeconds}" default="120" />;
+                var timerEl = document.getElementById('phoneOtpCountdown');
+                var submitBtn = document.getElementById('btnConfirmPhoneOtp');
+                function tick() {
+                    if (!timerEl) return;
+                    if (remaining <= 0) {
+                        timerEl.textContent = 'Hết hạn';
+                        timerEl.style.color = '#b91c1c';
+                        if (submitBtn) submitBtn.disabled = true;
+                        return;
+                    }
+                    var m = Math.floor(remaining / 60);
+                    var s = remaining % 60;
+                    timerEl.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                    remaining--;
+                    setTimeout(tick, 1000);
+                }
+                tick();
+
+                var resendCooldown = <c:out value="${sessionScope.changePhoneOtpData.resendCooldownRemainingSeconds}" default="30" />;
+                var resendBtn = document.getElementById('resendPhoneOtpBtn');
+                function updateResendCooldown() {
+                    if (!resendBtn) return;
+                    if (resendCooldown <= 0) {
+                        resendBtn.disabled = false;
+                        resendBtn.textContent = "Gửi lại mã OTP mới";
+                        resendBtn.style.opacity = "1";
+                        resendBtn.style.cursor = "pointer";
+                        return;
+                    }
+                    resendBtn.disabled = true;
+                    resendBtn.textContent = "Gửi lại mã OTP mới (" + resendCooldown + "s)";
+                    resendBtn.style.opacity = "0.6";
+                    resendBtn.style.cursor = "not-allowed";
+                    resendCooldown--;
+                    setTimeout(updateResendCooldown, 1000);
+                }
+                updateResendCooldown();
+            })();
+            </c:if>
         });
     </script>
 </body>
