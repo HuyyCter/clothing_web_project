@@ -33,7 +33,6 @@ public class AdminProductServlet extends HttpServlet {
 
 	private static final String LIST_VIEW = "/WEB-INF/views/admin/product-list.jsp";
 	private static final String FORM_VIEW = "/WEB-INF/views/admin/product-form.jsp";
-	private static final int PAGE_SIZE = PaginationUtil.DEFAULT_PAGE_SIZE;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -243,14 +242,7 @@ public class AdminProductServlet extends HttpServlet {
 	// PRIVATE HELPERS
 	// ==========================================
 	private void showList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		long totalProducts = Product.countAll();
-		int totalPages = PaginationUtil.totalPages(totalProducts, PAGE_SIZE);
-		int currentPage = PaginationUtil.clampPage(PaginationUtil.parsePage(request.getParameter("page")), totalPages);
-		List<ProductDTO> products = Product.getAll(PaginationUtil.offset(currentPage, PAGE_SIZE), PAGE_SIZE);
-
-		request.setAttribute("products", products);
-		request.setAttribute("currentPage", currentPage);
-		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("products", Product.getAll());
 		request.getRequestDispatcher(LIST_VIEW).forward(request, response);
 	}
 

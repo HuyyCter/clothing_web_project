@@ -338,21 +338,24 @@
                                                                             value="<c:out value='${variant.size}' />">
                                                                         <input type="hidden" name="color"
                                                                             value="<c:out value='${variant.color}' />">
-                                                                        <label class="admin-form-label">SKU
+                                                                        <label class="admin-form-label">
+                                                                            SKU
                                                                             <input type="text" name="sku"
                                                                                 class="admin-form-input" maxlength="255"
                                                                                 value="<c:out value='${variant.sku}' />"
                                                                                 required>
                                                                         </label>
-                                                                        <label class="admin-form-label">Giá
-                                                                            (₫)
+                                                                        <label class="admin-form-label">
+                                                                            Giá (₫)
                                                                             <input type="number" name="price"
                                                                                 class="admin-form-input" min="0"
                                                                                 step="0.01" value="${variant.price}"
                                                                                 required>
                                                                         </label>
                                                                         <button type="submit"
-                                                                            class="btn btn--primary btn--sm">Lưu</button>
+                                                                            class="btn btn--primary btn--sm">
+                                                                            Lưu
+                                                                        </button>
                                                                     </form>
                                                                 </details>
 
@@ -374,8 +377,9 @@
                                                                             value="${variant.price}">
                                                                         <button type="submit"
                                                                             class="btn btn--secondary btn--sm"
-                                                                            onclick="return confirm('Ngừng bán loại này?')">Ngừng
-                                                                            bán</button>
+                                                                            onclick="return confirm('Ngừng bán loại này?')">
+                                                                            Ngừng bán
+                                                                        </button>
                                                                     </form>
                                                                 </c:if>
                                                                 <c:if test="${variant.status == 'DISCONTINUED'}">
@@ -394,8 +398,9 @@
                                                                         <input type="hidden" name="price"
                                                                             value="${variant.price}">
                                                                         <button type="submit"
-                                                                            class="btn btn--secondary btn--sm">Bán
-                                                                            lại</button>
+                                                                            class="btn btn--secondary btn--sm">
+                                                                            Bán lại
+                                                                        </button>
                                                                     </form>
                                                                 </c:if>
                                                             </div>
@@ -406,8 +411,7 @@
                                                     <tr>
                                                         <td colspan="7"
                                                             style="text-align:center;color:var(--text-muted);padding:32px 0;">
-                                                            Chưa có loại hàng nào. Hãy thêm loại đầu tiên
-                                                            bên dưới.
+                                                            Chưa có loại hàng nào. Hãy thêm loại đầu tiên bên dưới.
                                                         </td>
                                                     </tr>
                                                 </c:if>
@@ -415,12 +419,13 @@
                                         </table>
                                     </div>
 
-                                    Thêm loại mới
+                                    <!-- Thêm loại mới -->
                                     <form method="post" action="AdminProductServlet" class="product-add-form">
                                         <input type="hidden" name="action" value="addVariant">
                                         <input type="hidden" name="productId" value="${product.id}">
-                                        <div class="admin-form-label product-add-form__title">Thêm loại
-                                            mới</div>
+                                        <div class="admin-form-label product-add-form__title">
+                                            Thêm loại mới
+                                        </div>
                                         <div class="product-add-form__row">
                                             <input type="text" name="size" class="admin-form-input"
                                                 placeholder="Size (vd M)" maxlength="255"
