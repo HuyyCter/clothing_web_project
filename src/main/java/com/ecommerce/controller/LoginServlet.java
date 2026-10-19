@@ -22,8 +22,14 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        session.setAttribute("logoName", "Guest");
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            String flashSuccess = (String) session.getAttribute("loginSuccessMessage");
+            if (flashSuccess != null) {
+                request.setAttribute("successMessage", flashSuccess);
+                session.removeAttribute("loginSuccessMessage");
+            }
+        }
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
@@ -32,14 +38,14 @@ public class LoginServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        String email = request.getParameter("email");
-        if (email == null || email.isBlank()) {
-            email = request.getParameter("identifier");
+        String identifier = request.getParameter("email");
+        if (identifier == null || identifier.isBlank()) {
+            identifier = request.getParameter("identifier");
         }
         String password = request.getParameter("password");
 
-        if (email == null || email.isBlank() || password == null || password.isBlank()) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Email và Mật khẩu.");
+        if (identifier == null || identifier.isBlank() || password == null || password.isBlank()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ Email / Số điện thoại và Mật khẩu.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
@@ -48,7 +54,7 @@ public class LoginServlet extends HttpServlet {
         try {
             em = JpaUtil.getEntityManager().createEntityManager();
             UserRepository userRepo = new UserRepository(em);
-            Optional<User> userOpt = userRepo.findByEmail(email.trim());
+            Optional<User> userOpt = userRepo.findByEmailOrPhone(identifier.trim());
 
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
@@ -68,7 +74,7 @@ public class LoginServlet extends HttpServlet {
                 }
             }
 
-            request.setAttribute("errorMessage", "Email hoặc mật khẩu không chính xác.");
+            request.setAttribute("errorMessage", "Email / Số điện thoại hoặc mật khẩu không chính xác.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
 
         } catch (Throwable ex) {
