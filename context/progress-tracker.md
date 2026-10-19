@@ -18,58 +18,28 @@ change.
 
 ## Completed
 
+- `model/Category.java` (id, name, description, slug) — khớp class diagram, danh mục phẳng. Có business method create, update, delete, getById, getAll.
+- `dto/CategoryDTO.java`, `validator/CategoryValidator.java`, `controller/AdminCategoryServlet.java`.
+- `views/admin/category-list.jsp`, `category-form.jsp` — nối với Servlet bằng JSTL.
+- `util/SlugUtil.java`, `repository/CategoryDB.java`.
 - [x] `src/main/webapp/index.jsp` — Giao diện trang chủ cửa hàng (Hero banner, danh mục nổi bật, sản phẩm mới, tính năng).
 - [x] `src/main/webapp/assets/css/admin.css` & `common.css` — Hệ thống design token và CSS thuần quản trị viên.
 - [x] `src/main/webapp/WEB-INF/views/admin/dashboard.jsp` — Tổng quan thống kê doanh thu, đơn hàng, khách hàng, biểu đồ và bảng hoạt động.
-- [x] `src/main/webapp/WEB-INF/views/admin/category-list.jsp` — Danh sách quản lý danh mục cha/con.
-- [x] `src/main/webapp/WEB-INF/views/admin/category-form.jsp` — Form thêm/sửa danh mục sản phẩm (hỗ trợ phân cấp 2 tầng).
-- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` — Danh sách sản phẩm với bộ lọc, trạng thái và hiển thị biến thể.
-- [x] `src/main/webapp/WEB-INF/views/admin/product-form.jsp` — Form thêm/sửa sản phẩm kèm quản lý biến thể (Size/Màu) và liên kết ảnh Cloudinary.
-- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` — Danh sách đơn hàng với bộ lọc trạng thái và phân trang.
-- [x] `src/main/webapp/WEB-INF/views/admin/order-detail.jsp` — Chi tiết đơn hàng, snapshot thông tin giao hàng, cập nhật state machine trạng thái đơn.
-- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` — Danh sách quản lý mã giảm giá (voucher).
-- [x] `src/main/webapp/WEB-INF/views/admin/voucher-form.jsp` — Form thêm/sửa voucher (% giảm, đơn tối thiểu, giảm tối đa, hạn dùng, giới hạn lượt dùng).
-- [x] `src/main/java/com/ecommerce/model/Address.java` — Bổ sung `recipientName` và `phone` vào Address entity khớp đặc tả UML và snapshot đơn hàng.
-- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt (không lưu plaintext).
-- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` — Repository truy vấn User (findByEmail, findByPhone, existsByEmail/existsByPhone, save, delete, phân trang).
-- [x] `src/test/java/com/ecommerce/util/PasswordUtilTest.java` — Unit test cho thuật toán mã hóa mật khẩu.
-- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet điều hướng và xử lý xác thực Đăng nhập sử dụng thuần lower-level Jakarta Servlet API (`HttpServlet`, `HttpSession`, `RequestDispatcher`), thiết lập tên logo/guest vào session và forward đến `login.jsp`.
-- [x] `src/main/webapp/index.jsp` — Điều hướng liên kết tài khoản ở menu sang `/login`, cập nhật hiển thị động tên logo sang Guest qua session/Servlet API.
-- [x] `src/main/webapp/login.jsp` — Cập nhật form action theo contextPath, hiển thị thông báo lỗi và trạng thái người dùng/Guest.
+- [x] `src/main/webapp/WEB-INF/views/admin/product-list.jsp` & `product-form.jsp` — Quản lý sản phẩm, biến thể và liên kết ảnh Cloudinary.
+- [x] `src/main/webapp/WEB-INF/views/admin/order-list.jsp` & `order-detail.jsp` — Danh sách và chi tiết đơn hàng.
+- [x] `src/main/webapp/WEB-INF/views/admin/voucher-list.jsp` & `voucher-form.jsp` — Quản lý voucher.
+- [x] `src/main/java/com/ecommerce/model/Address.java` — Entity Address có recipientName và phone.
+- [x] `src/main/java/com/ecommerce/util/PasswordUtil.java` — Helper băm và xác thực mật khẩu qua jBCrypt.
+- [x] `src/main/java/com/ecommerce/repository/UserRepository.java` & `UserDB.java` — Quản lý truy vấn User.
+- [x] `src/main/java/com/ecommerce/controller/LoginServlet.java` — Servlet xác thực đăng nhập session.
+- [x] `src/main/webapp/login.jsp` & `register.jsp` — Giao diện đăng nhập và đăng ký (đã cập nhật hiển thị errorMessage).
+- [x] `src/main/java/com/ecommerce/controller/RegisterServlet.java` — Servlet xử lý đăng ký tài khoản mới và tạo session đăng nhập tự động.
 
 ## In Progress
 
-- Module HAS: Hoàn thiện tầng Service & Controller cho Authentication (Login, Register, Logout).
-
-- `model/Category.java` (id, name, description, slug) — khớp class
-  diagram, danh mục phẳng, không có parent. Có business method
-  `create`, `update`, `delete`, `getById`, `getAll` (Model tự mở
-  `EntityManager` + transaction, trả/nhận `CategoryDTO`).
-- `dto/CategoryDTO.java` — id, name, description, slug; có
-  `fromEntity`. Không dùng annotation validation.
-- `validator/CategoryValidator.java` — `validate(CategoryDTO)` bằng
-  if/else, trả thông báo lỗi hoặc `null`.
-- `controller/AdminCategoryServlet.java` (`/AdminCategoryServlet`):
-  GET list / `action=new` / `action=edit&id=`; POST
-  `action=create|update|delete`. Lỗi validate thì forward lại form
-  kèm `formError`; thành công thì forward về list kèm
-  `successMessage`.
-- `views/admin/category-list.jsp`, `category-form.jsp` — nối với
-  Servlet bằng JSTL (không scriptlet), bỏ phần cha/con, tìm kiếm,
-  lọc, phân trang, cột số sản phẩm; form dùng chung cho tạo/sửa, có
-  thêm ô Mô tả.
-- `util/SlugUtil.java` — `toSlug(String)` bỏ dấu tiếng Việt, ra
-  dạng `ao-thun-nam`.
-- `repository/CategoryDB.java` — insert/update/delete/findById/
-  findAll/existsBySlug/existsBySlugExcludingId, static method nhận
-  `EntityManager` từ Model, không mở transaction, không try-catch.
-
-## In Progress
-
-- Unit "CRUD Category": còn test thủ công. Rule chặn
-  xóa khi còn sản phẩm chưa làm (đang có `TODO` trong
-  `Category.delete`), cần thêm query đếm sản phẩm trong `CategoryDB`
-  sau khi có entity `Product`.
+- Hoàn thiện luồng xác thực Customer/Admin và tích hợp với client side.
+- Unit "CRUD Category": còn test thủ công. Rule chặn xóa khi còn sản phẩm chưa làm (đang có TODO trong Category.delete), cần thêm query đếm sản phẩm trong CategoryDB sau khi có entity Product.
+- [Bug UI] Sửa lỗi tính năng hiện/ẩn mật khẩu: icon/nút toggle chỉ xuất hiện khi bắt đầu nhập vào ô trống.
 
 ## Next Up
 
@@ -79,6 +49,8 @@ change.
   (chia unit / viết spec feature) — không tự động làm tiếp.
 
 ## Open Questions
+
+- [Bug/UI] Tính năng hiện mật khẩu hoạt động không ổn định: nút/icon chỉ xuất hiện khi bắt đầu nhập vào ô trống (cần chuẩn hóa hiển thị giữa CSS và JavaScript cho ô input password).
 
 ## Architecture Decisions
 

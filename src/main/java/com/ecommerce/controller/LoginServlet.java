@@ -19,17 +19,16 @@ import java.util.Optional;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         session.setAttribute("logoName", "Guest");
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
@@ -47,7 +46,7 @@ public class LoginServlet extends HttpServlet {
 
         EntityManager em = null;
         try {
-            em = JpaUtil.createEntityManager();
+            em = JpaUtil.getEntityManager().createEntityManager();
             UserRepository userRepo = new UserRepository(em);
             Optional<User> userOpt = userRepo.findByEmail(email.trim());
 
@@ -61,7 +60,7 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("logoName", user.getFullName() != null ? user.getFullName() : user.getEmail());
 
                     if (user.getRole() == UserRole.ADMIN) {
-                        response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                        response.sendRedirect(request.getContextPath() + "/admin-home.jsp");
                     } else {
                         response.sendRedirect(request.getContextPath() + "/index.jsp");
                     }

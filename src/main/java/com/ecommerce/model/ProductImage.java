@@ -110,9 +110,10 @@ public class ProductImage {
         try {
             trans.begin();
 
-            if (ProductImageDB.isProductImageIdExists(em, id)) {
+            if (!ProductImageDB.isProductImageIdExists(em, id)) {
                 throw new NotFoundException("Không tìm thấy ảnh sản phẩm có id = " + id);
             }
+
             ProductImage productImage = ProductImageDB.findById(em, id);
             ProductImageDB.delete(em, productImage);
 
@@ -154,11 +155,9 @@ public class ProductImage {
             throw new BusinessException(error);
         }
 
-        int productId = dto.getProductId();
         String imageUrl = dto.getImageUrl().trim();
         String color = normalizeColor(dto.getColor());
 
-        dto.setProductId(productId);
         dto.setImageUrl(imageUrl);
         dto.setColor(color);
     }

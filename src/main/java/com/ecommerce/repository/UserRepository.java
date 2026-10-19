@@ -29,6 +29,7 @@ public class UserRepository {
         }
         throw new IllegalStateException("EntityManager chưa được cung cấp cho UserRepository.");
     }
+
     public Optional<User> findById(int id) {
         return findById(null, id);
     }
@@ -83,9 +84,7 @@ public class UserRepository {
         }
         EntityManager activeEm = getEffectiveEntityManager(em);
         String jpql = "SELECT COUNT(u) FROM User u WHERE LOWER(TRIM(u.email)) = LOWER(TRIM(:email))";
-        Long count = activeEm.createQuery(jpql, Long.class)
-                .setParameter("email", email)
-                .getSingleResult();
+        Long count = activeEm.createQuery(jpql, Long.class).setParameter("email", email).getSingleResult();
         return count != null && count > 0;
     }
 
@@ -99,9 +98,7 @@ public class UserRepository {
         }
         EntityManager activeEm = getEffectiveEntityManager(em);
         String jpql = "SELECT COUNT(u) FROM User u WHERE TRIM(u.phone) = TRIM(:phone)";
-        Long count = activeEm.createQuery(jpql, Long.class)
-                .setParameter("phone", phone)
-                .getSingleResult();
+        Long count = activeEm.createQuery(jpql, Long.class).setParameter("phone", phone).getSingleResult();
         return count != null && count > 0;
     }
 
