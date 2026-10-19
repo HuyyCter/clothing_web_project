@@ -1,0 +1,52 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- Navbar dùng chung cho các trang thanh toán MoMo (copy markup từ cart.jsp, không sửa file gốc) --%>
+    <!-- NAVBAR CHUNG -->
+    <header class="navbar">
+        <div class="navbar__inner">
+            <a href="${ctx}/" class="navbar__logo">Fashion<span>.</span></a>
+
+            <form class="navbar__search" action="${ctx}/products" method="get">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." value="">
+            </form>
+
+            <nav class="navbar__actions">
+                <a href="${ctx}/wishlist/toggle" class="navbar__icon-btn" title="Wishlist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                </a>
+                <a href="${ctx}/cart" class="navbar__icon-btn" title="Giỏ hàng" id="cartNavBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    <c:if test="${not empty cart and cart.totalQuantity > 0}">
+                        <span class="navbar__cart-badge" id="cartNavBadge">${cart.totalQuantity}</span>
+                    </c:if>
+                </a>
+                <div class="navbar__divider"></div>
+                <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Tài khoản">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span id="logoText">
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <c:out value="${sessionScope.user.fullName}" />
+                            </c:when>
+                            <c:when test="${not empty sessionScope.logoName}">
+                                <c:out value="${sessionScope.logoName}" />
+                            </c:when>
+                            <c:otherwise>Tài khoản</c:otherwise>
+                        </c:choose>
+                    </span>
+                </a>
+            </nav>
+        </div>
+    </header>
