@@ -50,7 +50,7 @@ public class Order {
 
     @Column(name = "note")
     private String note;
-    
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -112,7 +112,7 @@ public class Order {
     public void setStatus(OrderStatus status) {
         this.status = status;
     }
-    
+
     public java.math.BigDecimal getTotalAmount() {
         return totalAmount;
     }
@@ -218,11 +218,9 @@ public class Order {
         try {
             List<OrderDTO> orders = new ArrayList<>();
             for (Order order : OrderDB.findAll(em)) {
-                orders.add(OrderDTO.fromEntity(order));
+                orders.add(new OrderDTO(order));
             }
             return orders;
-        } catch (RuntimeException e) {
-            throw e;
         } finally {
             em.close();
         }
