@@ -155,8 +155,7 @@
                                                     </td>
                                                     <td
                                                         style="color:var(--text-muted);font-size:12px;white-space:nowrap;">
-                                                        <c:out
-                                                            value="${fn:replace(fn:substring(order.createdAt, 0, 16), 'T', ' ')}" />
+                                                        <c:out value="${order.formattedCreatedAt}" />
                                                     </td>
                                                     <td>
                                                         <div class="admin-table__actions">
