@@ -40,91 +40,12 @@
                                 <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." value="">
                             </form>
 
-                <nav class="navbar__actions">
-                    <a href="/clothing_web_project/wishlist/toggle" class="navbar__icon-btn" title="Wishlist">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                    </a>
-                    <a href="/cart" class="navbar__icon-btn" title="Giỏ hàng">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                            <line x1="3" y1="6" x2="21" y2="6" />
-                            <path d="M16 10a4 4 0 0 1-8 0" />
-                        </svg>
-                        <span class="navbar__cart-badge">2</span>
-                    </a>
-                    <div class="navbar__divider"></div>
-                    <a href="/profile" class="navbar__user-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
-                        </svg>
-                        HuyCter
-                    </a>
-                </nav>
-            </div>
-        </header>
-
-        <!-- CATEGORY NAV -->
-        <nav class="cat-nav">
-            <div class="cat-nav__inner">
-                <a href="${pageContext.request.contextPath}/products" class="cat-nav__item cat-nav__item--active">Tất cả</a>
-                <a href="${pageContext.request.contextPath}/products?categoryId=1" class="cat-nav__item">Áo</a>
-                <a href="${pageContext.request.contextPath}/products?categoryId=2" class="cat-nav__item">Quần</a>
-                <a href="${pageContext.request.contextPath}/products?categoryId=3" class="cat-nav__item">Áo khoác</a>
-                <a href="${pageContext.request.contextPath}/products?categoryId=4" class="cat-nav__item">Phụ kiện</a>
-            </div>
-        </nav>
-
-        <!-- HERO -->
-        <section class="hero">
-            <div class="hero__inner">
-                <div class="hero__text">
-                    <p class="hero__eyebrow">Bộ sưu tập mới — Thu Đông 2026</p>
-                    <h1 class="hero__title">Tối giản.<br>Bền vững.<br>Đẳng cấp.</h1>
-                    <p class="hero__desc">Thời trang không cần phức tạp. Chúng tôi tin rằng cái đẹp thực sự đến từ sự
-                        đơn giản — chất liệu tốt, đường may chuẩn, và thiết kế vượt thời gian.</p>
-                    <div class="hero__actions">
-                        <a href="/products" class="hero__btn-primary">
-                            Khám phá ngay
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                                <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                        </a>
-                        <a href="/products?sort=newest" class="hero__btn-secondary">Hàng mới về</a>
-                    </div>
-                </div>
-                <div class="hero__image-wrap">
-                    <img src="/assets/img/hero-placeholder.jpg" alt="Bộ sưu tập mới">
-                </div>
-            </div>
-        </section>
-
-        <!-- FEATURED PRODUCTS -->
-        <section class="section">
-            <div class="section__inner">
-                <div class="section__head">
-                    <h2 class="section__title">Sản phẩm nổi bật</h2>
-                    <a href="${pageContext.request.contextPath}/products" class="section__link">Xem tất cả →</a>
-                </div>
-                <div class="product-grid">
-                    <article class="product-card">
-                        <div class="product-card__img-wrap">
-                            <a href="/products/1">
-                                <div
-                                    style="width:100%;height:100%;background:var(--bg-base);display:flex;align-items:center;justify-content:center;">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                        stroke="var(--border-default)" stroke-width="2">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                                        <circle cx="8.5" cy="8.5" r="1.5" />
-                                        <polyline points="21 15 16 10 5 21" />
+                            <nav class="navbar__actions">
+                                <a href="${ctx}/wishlist/toggle" class="navbar__icon-btn" title="Wishlist">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                                     </svg>
                                 </a>
                                 <a href="${ctx}/cart" class="navbar__icon-btn" title="Giỏ hàng">
@@ -155,28 +76,14 @@
                                         </div>
                                     </c:when>
                                     <c:otherwise>
-                                        <div class="navbar__guest-group">
-                                            <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Đăng nhập">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                                                    <polyline points="10 17 15 12 10 7" />
-                                                    <line x1="15" y1="12" x2="3" y2="12" />
-                                                </svg>
-                                                <span id="logoText">Đăng nhập</span>
-                                            </a>
-                                            <span class="navbar__guest-divider">|</span>
-                                            <a href="${ctx}/register" class="navbar__user-link" id="navRegisterLink" title="Đăng ký tài khoản">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                                    <circle cx="8.5" cy="7" r="4" />
-                                                    <line x1="20" y1="8" x2="20" y2="14" />
-                                                    <line x1="23" y1="11" x2="17" y2="11" />
-                                                </svg>
-                                                <span>Đăng ký</span>
-                                            </a>
-                                        </div>
+                                        <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Đăng nhập">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                            </svg>
+                                            <span id="logoText"><c:out value="${not empty sessionScope.logoName ? sessionScope.logoName : 'Đăng nhập'}" /></span>
+                                        </a>
                                     </c:otherwise>
                                 </c:choose>
                             </nav>

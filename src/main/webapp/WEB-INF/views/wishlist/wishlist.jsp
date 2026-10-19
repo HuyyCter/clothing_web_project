@@ -1,252 +1,266 @@
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+	<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sản phẩm yêu thích</title>
+        <!DOCTYPE html>
+        <html lang="vi">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Sản phẩm yêu thích</title>
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f7f7f7;
-            color: #222;
-        }
+            <style>
+                * {
+                    box-sizing: border-box;
+                }
 
-        .wishlist-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+                body {
+                    margin: 0;
+                    font-family: Arial, sans-serif;
+                    background: #f7f7f7;
+                    color: #222;
+                }
 
-        .wishlist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            gap: 16px;
-        }
+                .wishlist-container {
+                    max-width: 1200px;
+                    margin: 40px auto;
+                    padding: 0 20px;
+                }
 
-        .wishlist-header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
+                .wishlist-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 28px;
+                    gap: 16px;
+                }
 
-        .wishlist-count {
-            color: #777;
-            font-size: 14px;
-            margin-top: 8px;
-        }
+                .wishlist-header h1 {
+                    margin: 0;
+                    font-size: 28px;
+                }
 
-        .back-link {
-            color: #222;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            padding: 10px 16px;
-            border-radius: 6px;
-        }
+                .wishlist-count {
+                    color: #777;
+                    font-size: 14px;
+                    margin-top: 8px;
+                }
 
-        .back-link:hover {
-            background: #eee;
-        }
+                .back-link {
+                    color: #222;
+                    text-decoration: none;
+                    border: 1px solid #ddd;
+                    padding: 10px 16px;
+                    border-radius: 6px;
+                }
 
-        .wishlist-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 22px;
-        }
+                .back-link:hover {
+                    background: #eee;
+                }
 
-        .wishlist-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #eee;
-        }
+                .wishlist-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 22px;
+                }
 
-        .product-image {
-            height: 220px;
-            background: #eee;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #888;
-        }
+                .wishlist-card {
+                    background: white;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    border: 1px solid #eee;
+                }
 
-        .product-info {
-            padding: 16px;
-        }
+                .product-image {
+                    height: 220px;
+                    background: #eee;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: #888;
+                }
 
-        .product-name {
-            font-size: 17px;
-            margin: 0 0 10px;
-        }
+                .product-info {
+                    padding: 16px;
+                }
 
-        .product-description {
-            color: #777;
-            font-size: 13px;
-            line-height: 1.5;
-            min-height: 38px;
-        }
+                .product-name {
+                    font-size: 17px;
+                    margin: 0 0 10px;
+                }
 
-        .product-price {
-            font-weight: bold;
-            margin: 14px 0;
-        }
+                .product-description {
+                    color: #777;
+                    font-size: 13px;
+                    line-height: 1.5;
+                    min-height: 38px;
+                }
 
-        .card-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+                .product-price {
+                    font-weight: bold;
+                    margin: 14px 0;
+                }
 
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 11px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 14px;
-            text-decoration: none;
-        }
+                .card-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
 
-        .btn-detail {
-            background: #222;
-            color: white;
-        }
+                .btn {
+                    display: block;
+                    width: 100%;
+                    padding: 11px;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    text-align: center;
+                    font-size: 14px;
+                    text-decoration: none;
+                }
 
-        .btn-remove {
-            background: white;
-            color: #c62828;
-            border: 1px solid #e0bcbc;
-        }
+                .btn-detail {
+                    background: #222;
+                    color: white;
+                }
 
-        .btn:hover {
-            opacity: 0.85;
-        }
+                .btn-remove {
+                    background: white;
+                    color: #c62828;
+                    border: 1px solid #e0bcbc;
+                }
 
-        .empty-state {
-            background: white;
-            border-radius: 10px;
-            padding: 60px 20px;
-            text-align: center;
-        }
+                .btn:hover {
+                    opacity: 0.85;
+                }
 
-        .empty-heart {
-            font-size: 48px;
-            color: #bbb;
-        }
+                .empty-state {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 60px 20px;
+                    text-align: center;
+                }
 
-        .empty-state p {
-            color: #777;
-            margin: 12px 0 24px;
-        }
+                .empty-heart {
+                    font-size: 48px;
+                    color: #bbb;
+                }
 
-        @media (max-width: 900px) {
-            .wishlist-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
+                .empty-state p {
+                    color: #777;
+                    margin: 12px 0 24px;
+                }
 
-        @media (max-width: 500px) {
-            .wishlist-grid {
-                grid-template-columns: 1fr;
-            }
+                @media (max-width: 900px) {
+                    .wishlist-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
 
-            .wishlist-header h1 {
-                font-size: 22px;
-            }
-        }
-    </style>
-</head>
+                @media (max-width: 500px) {
+                    .wishlist-grid {
+                        grid-template-columns: 1fr;
+                    }
 
-<body>
-    <main class="wishlist-container">
+                    .wishlist-header h1 {
+                        font-size: 22px;
+                    }
+                }
+            </style>
+        </head>
 
-        <div class="wishlist-header">
-            <div>
-                <h1>♡ Sản phẩm yêu thích</h1>
-                <p class="wishlist-count">
-                    Bạn có
-                    <strong><c:out value="${wishlistItems.size()}" default="0"/></strong>
-                    sản phẩm yêu thích
-                </p>
-            </div>
+        <body>
+            <main class="wishlist-container">
 
-            <a class="back-link"
-               href="${pageContext.request.contextPath}/products">
-                ← Tiếp tục mua sắm
-            </a>
-        </div>
+                <div class="wishlist-header">
+                    <div>
+                        <h1>♡ Sản phẩm yêu thích</h1>
+                        <p class="wishlist-count">
+                            Bạn có
+                            <strong>
+                                <c:out value="${wishlistItems.size()}" default="0" />
+                            </strong>
+                            sản phẩm yêu thích
+                        </p>
+                    </div>
 
-        <c:choose>
-            <c:when test="${empty wishlistItems}">
-                <section class="empty-state">
-                    <div class="empty-heart">♡</div>
-                    <h2>Wishlist đang trống</h2>
-                    <p>Hãy thêm những sản phẩm bạn yêu thích để dễ dàng tìm lại sau này.</p>
-
-                    <a class="btn btn-detail"
-                       style="max-width: 220px; margin: 0 auto;"
-                       href="${pageContext.request.contextPath}/products">
-                        Khám phá sản phẩm
+                    <a class="back-link" href="${pageContext.request.contextPath}/products">
+                        ← Tiếp tục mua sắm
                     </a>
-                </section>
-            </c:when>
+                </div>
 
-            <c:otherwise>
-                <section class="wishlist-grid">
-                    <c:forEach var="item" items="${wishlistItems}">
-                        <article class="wishlist-card">
+                <c:choose>
+                    <c:when test="${empty wishlistItems}">
+                        <section class="empty-state">
+                            <div class="empty-heart">♡</div>
+                            <h2>Wishlist đang trống</h2>
+                            <p>Hãy thêm những sản phẩm bạn yêu thích để dễ dàng tìm lại sau này.</p>
 
-                            <div class="product-image">
-                                Ảnh sản phẩm
-                            </div>
+                            <a class="btn btn-detail" style="max-width: 220px; margin: 0 auto;"
+                                href="${pageContext.request.contextPath}/products">
+                                Khám phá sản phẩm
+                            </a>
+                        </section>
+                    </c:when>
 
-                            <div class="product-info">
-                                <h2 class="product-name">
-                                    <c:out value="${item.product.name}"/>
-                                </h2>
+                    <c:otherwise>
+                        <section class="wishlist-grid">
+                            <c:forEach var="item" items="${wishlistItems}">
+                                <article class="wishlist-card">
 
-                                <p class="product-description">
-                                    <c:out value="${item.product.description}"/>
-                                </p>
+                                    <div class="product-image">
+                                        Ảnh sản phẩm
+                                    </div>
 
-                                <p class="product-price">
-                                    <c:out value="${item.product.price}"/> VNĐ
-                                </p>
+                                    <div class="product-info">
+                                        <h2 class="product-name">
+                                            <c:out value="${item.product.name}" />
+                                        </h2>
 
-                                <div class="card-actions">
-                                   
-                                    <form method="post"
-                                          action="${pageContext.request.contextPath}/wishlist">
-                                        <input type="hidden" name="action" value="remove">
-                                        <input type="hidden"
-                                               name="productId"
-                                               value="${item.product.id}">
+                                        <p class="product-description">
+                                            <c:out value="${item.product.description}" />
+                                        </p>
 
-                                        <button class="btn btn-remove" type="submit">
-                                            ♡ Bỏ yêu thích
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                                        <c:set var="priceRange"
+										       value="${priceRanges[item.product.id]}" />
+										
+										<p class="product-price">
+										    <c:choose>
+										        <c:when test="${empty priceRange or empty priceRange[0]}">
+										            Tạm hết hàng
+										        </c:when>
+										
+										        <c:otherwise>
+										            Từ
+										            <fmt:formatNumber
+										                value="${priceRange[0]}"
+										                pattern="#,##0"
+										                groupingUsed="true" /> ₫
+										        </c:otherwise>
+										    </c:choose>
+										</p>
 
-                        </article>
-                    </c:forEach>
-                </section>
-            </c:otherwise>
-        </c:choose>
+                                        <div class="card-actions">
 
-    </main>
-</body>
-</html>
+                                            <form method="post" action="${pageContext.request.contextPath}/wishlist/toggle">
+                                                <input type="hidden" name="action" value="remove">
+                                                <input type="hidden" name="productId" value="${item.product.id}">
+
+                                                <button class="btn btn-remove" type="submit">
+                                                    ♡ Bỏ yêu thích
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </article>
+                            </c:forEach>
+                        </section>
+                    </c:otherwise>
+                </c:choose>
+
+            </main>
+        </body>
+
+        </html>

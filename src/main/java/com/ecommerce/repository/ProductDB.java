@@ -72,6 +72,10 @@ public class ProductDB {
 
 
     // ==================== Phúc Nguyên ====================
+    public static List<Product> findAll(EntityManager em) {
+        String queryString = "SELECT p FROM Product p";
+        return em.createQuery(queryString, Product.class).getResultList();
+    }
 
     public static List<Product> findByCategoryId(EntityManager em, int categoryId) {
         String queryString = "SELECT p FROM Product p WHERE p.category.id = :categoryId";

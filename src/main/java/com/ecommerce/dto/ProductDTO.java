@@ -14,20 +14,17 @@ public class ProductDTO {
     public ProductDTO() {
     }
 
-    public ProductDTO(
-            int id,
-            String name,
-            String description,
-            String categoryName,
-            String primaryImageUrl,
-            BigDecimal minPrice) {
-
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.categoryName = categoryName;
-        this.primaryImageUrl = primaryImageUrl;
-        this.minPrice = minPrice;
+    public static ProductDTO fromEntity(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.id = product.getId();
+        dto.name = product.getName();
+        dto.description = product.getDescription();
+        dto.isActive = product.isActive();
+        if (product.getCategory() != null) {
+            dto.categoryId = product.getCategory().getId();
+            dto.categoryName = product.getCategory().getName();
+        }
+        return dto;
     }
 
     public int getId() {
@@ -66,12 +63,8 @@ public class ProductDTO {
         return primaryImageUrl;
     }
 
-    public void setPrimaryImageUrl(String primaryImageUrl) {
-        this.primaryImageUrl = primaryImageUrl;
-    }
-
-    public BigDecimal getMinPrice() {
-        return minPrice;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public void setMinPrice(BigDecimal minPrice) {

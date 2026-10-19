@@ -1,7 +1,6 @@
 package com.ecommerce.model;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
@@ -37,12 +36,7 @@ public class Product {
 
     public Product() {}
 
-    public Product(
-            String name,
-            String description,
-            Category category,
-            BigDecimal price) {
-
+    public Product(String name, String description, Category category) {
         this.name = name;
         this.description = description;
         this.category = category;
