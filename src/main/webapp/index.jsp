@@ -61,13 +61,17 @@
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
                                         <div class="navbar__user-dropdown" id="userDropdown">
-                                            <button type="button" class="navbar__user-link navbar__user-dropdown-toggle" id="userDropdownBtn" aria-expanded="false" title="Tài khoản">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
+                                            <button type="button" class="navbar__user-link navbar__user-dropdown-toggle"
+                                                id="userDropdownBtn" aria-expanded="false" title="Tài khoản">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                                     <circle cx="12" cy="7" r="4" />
                                                 </svg>
-                                                <span id="logoText"><c:out value="${not empty sessionScope.user.fullName ? sessionScope.user.fullName : (not empty sessionScope.logoName ? sessionScope.logoName : 'HuyCter')}" /></span>
+                                                <span id="logoText">
+                                                    <c:out
+                                                        value="${not empty sessionScope.user.fullName ? sessionScope.user.fullName : (not empty sessionScope.logoName ? sessionScope.logoName : 'HuyCter')}" />
+                                                </span>
                                             </button>
                                             <div class="navbar__user-menu" id="userMenuPanel">
                                                 <a href="${ctx}/profile">Hồ sơ</a>
@@ -77,9 +81,10 @@
                                     </c:when>
                                     <c:otherwise>
                                         <div class="navbar__guest-group">
-                                            <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Đăng nhập">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
+                                            <a href="${ctx}/login" class="navbar__user-link" id="navUserLink"
+                                                title="Đăng nhập">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                                                     <polyline points="10 17 15 12 10 7" />
                                                     <line x1="15" y1="12" x2="3" y2="12" />
@@ -87,9 +92,10 @@
                                                 <span id="logoText">Đăng nhập</span>
                                             </a>
                                             <span class="navbar__guest-divider">|</span>
-                                            <a href="${ctx}/register" class="navbar__user-link" id="navRegisterLink" title="Đăng ký tài khoản">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
+                                            <a href="${ctx}/register" class="navbar__user-link" id="navRegisterLink"
+                                                title="Đăng ký tài khoản">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                                                     <circle cx="8.5" cy="7" r="4" />
                                                     <line x1="20" y1="8" x2="20" y2="14" />
@@ -137,9 +143,6 @@
                                     </a>
                                     <a href="${ctx}/products?sort=newest" class="hero__btn-secondary">Hàng mới về</a>
                                 </div>
-                            </div>
-                            <div class="hero__image-wrap">
-                                <img src="${ctx}/assets/img/hero-placeholder.jpg" alt="Bộ sưu tập mới">
                             </div>
                         </div>
                     </section>
