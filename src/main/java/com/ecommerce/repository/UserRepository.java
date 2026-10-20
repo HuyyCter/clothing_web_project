@@ -74,6 +74,23 @@ public class UserRepository {
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
+    public Optional<User> findByEmailOrPhone(String identifier) {
+        return findByEmailOrPhone(null, identifier);
+    }
+
+    public Optional<User> findByEmailOrPhone(EntityManager em, String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            return Optional.empty();
+        }
+        EntityManager activeEm = getEffectiveEntityManager(em);
+        String jpql = "SELECT u FROM User u WHERE LOWER(TRIM(u.email)) = LOWER(TRIM(:id)) OR TRIM(u.phone) = TRIM(:id)";
+        TypedQuery<User> query = activeEm.createQuery(jpql, User.class);
+        query.setParameter("id", identifier.trim());
+
+        List<User> results = query.getResultList();
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
     public boolean existsByEmail(String email) {
         return existsByEmail(null, email);
     }

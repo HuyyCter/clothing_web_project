@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+	<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
         <!DOCTYPE html>
         <html lang="vi">
@@ -221,13 +222,28 @@
                                             <c:out value="${item.product.description}" />
                                         </p>
 
-                                        <p class="product-price">
-                                            <c:out value="${item.product.price}" /> VNĐ
-                                        </p>
+                                        <c:set var="priceRange"
+										       value="${priceRanges[item.product.id]}" />
+										
+										<p class="product-price">
+										    <c:choose>
+										        <c:when test="${empty priceRange or empty priceRange[0]}">
+										            Tạm hết hàng
+										        </c:when>
+										
+										        <c:otherwise>
+										            Từ
+										            <fmt:formatNumber
+										                value="${priceRange[0]}"
+										                pattern="#,##0"
+										                groupingUsed="true" /> ₫
+										        </c:otherwise>
+										    </c:choose>
+										</p>
 
                                         <div class="card-actions">
 
-                                            <form method="post" action="${pageContext.request.contextPath}/wishlist">
+                                            <form method="post" action="${pageContext.request.contextPath}/wishlist/toggle">
                                                 <input type="hidden" name="action" value="remove">
                                                 <input type="hidden" name="productId" value="${item.product.id}">
 
