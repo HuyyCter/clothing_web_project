@@ -81,11 +81,16 @@
     font-size: 13px;
 }
 
+.btn--sm {
+    padding: 4px 10px;
+    font-size: 13px;
+}
+
 /* ---------- Thao tác theo loại hàng ---------- */
 .product-type-actions {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
 }
 
@@ -97,8 +102,7 @@
 
 .product-qty-input {
     width: 72px;
-    height: 28px;
-    padding: 0 8px;
+    padding: 4px 8px;
 }
 
 .product-edit-details summary {
@@ -177,8 +181,4 @@
     text-align: center;
     color: var(--text-muted);
     padding: 24px 0;
-}
-
-.product-add-form__row {
-    align-items: stretch;
 }
