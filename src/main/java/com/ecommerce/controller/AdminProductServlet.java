@@ -33,6 +33,7 @@ public class AdminProductServlet extends HttpServlet {
 
 	private static final String LIST_VIEW = "/WEB-INF/views/admin/product-list.jsp";
 	private static final String FORM_VIEW = "/WEB-INF/views/admin/product-form.jsp";
+	private static final int PAGE_SIZE = PaginationUtil.DEFAULT_PAGE_SIZE;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -55,7 +56,7 @@ public class AdminProductServlet extends HttpServlet {
 			showForm(request, response, new ProductDTO());
 		} else if ("edit".equals(action)) {
 			int id = parseId(request);
-			showEdit(request, response, id);
+			showForm(request, response, Product.getById(id));
 		} else {
 			throw new BusinessException("Hành động không hợp lệ.");
 		}
@@ -104,11 +105,12 @@ public class AdminProductServlet extends HttpServlet {
 			return;
 		}
 
-		// Tạo xong chuyển thẳng sang trang Edit của sản phẩm vừa tạo
+		// Tạo xong chuyển thẳng sang trang sửa của sản phẩm vừa tạo,
+		// vì loại hàng (variant) và ảnh chỉ thêm được khi sản phẩm đã có id.
 		ProductDTO createdProduct = Product.create(dto);
 		String message = "Đã tạo sản phẩm \"" + createdProduct.getName() + "\" thành công.";
 		request.setAttribute("successMessage", message);
-		showEdit(request, response, createdProduct.getId());
+		showForm(request, response, Product.getById(createdProduct.getId()));
 	}
 
 	private void handleUpdate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -135,7 +137,10 @@ public class AdminProductServlet extends HttpServlet {
 		showList(request, response);
 	}
 
-	// ========================== ProductVariant ==========================
+	// ---- Loại hàng (ProductVariant) ----
+	// Form gửi kèm hidden productId/size/color/sku/price cho mọi thao tác theo loại.
+	// Lỗi validate -> hiện lại trang sửa kèm lỗi; BusinessException/NotFoundException ->
+	// GlobalExceptionFilter.
 	private void handleAddVariant(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ProductVariantDTO dto = readVariantDto(request);
 		String error = ProductVariantValidator.validate(dto, true);
@@ -190,7 +195,8 @@ public class AdminProductServlet extends HttpServlet {
 		showEdit(request, response, dto.getProductId());
 	}
 
-	// ========================== ProductImage ==========================
+	// ---- Ảnh (ProductImage) ----
+	// Validate hết (sản phẩm, màu, file) TRƯỚC khi upload để không sinh file mồ côi trên Cloudinary.
 	private void handleAddImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int productId = parseProductId(request);
 		String color = request.getParameter("color");
@@ -237,7 +243,14 @@ public class AdminProductServlet extends HttpServlet {
 	// PRIVATE HELPERS
 	// ==========================================
 	private void showList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setAttribute("products", Product.getAll());
+		long totalProducts = Product.countAll();
+		int totalPages = PaginationUtil.totalPages(totalProducts, PAGE_SIZE);
+		int currentPage = PaginationUtil.clampPage(PaginationUtil.parsePage(request.getParameter("page")), totalPages);
+		List<ProductDTO> products = Product.getAll(PaginationUtil.offset(currentPage, PAGE_SIZE), PAGE_SIZE);
+
+		request.setAttribute("products", products);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
 		request.getRequestDispatcher(LIST_VIEW).forward(request, response);
 	}
 
@@ -247,10 +260,12 @@ public class AdminProductServlet extends HttpServlet {
 		request.getRequestDispatcher(FORM_VIEW).forward(request, response);
 	}
 
+	// Hiện lại trang sửa sản phẩm (dữ liệu mới từ DB).
 	private void showEdit(HttpServletRequest request, HttpServletResponse response, int productId) throws ServletException, IOException {
 		showForm(request, response, Product.getById(productId));
 	}
 
+	// Lỗi validate ở form loại hàng: hiện lại trang sửa kèm lỗi và giá trị vừa nhập (variantForm).
 	private void showVariantError(HttpServletRequest request, HttpServletResponse response, ProductVariantDTO dto, String error)
 			throws ServletException, IOException {
 		request.setAttribute("variantForm", dto);
@@ -262,6 +277,8 @@ public class AdminProductServlet extends HttpServlet {
 			IOException {
 		ProductDTO product = dto;
 		if (dto.getId() > 0) {
+			// Đang sửa: lấy lại sản phẩm từ DB để trang sửa vẫn hiện đủ loại hàng và ảnh,
+			// rồi đè lại các giá trị người dùng vừa nhập để họ không phải gõ lại.
 			product = Product.getById(dto.getId());
 			product.setName(dto.getName());
 			product.setDescription(dto.getDescription());
@@ -274,31 +291,23 @@ public class AdminProductServlet extends HttpServlet {
 	private ProductDTO readDto(HttpServletRequest request) {
 		String name = request.getParameter("name");
 		String description = request.getParameter("description");
-		int categoryId = parseCategoryId(request);
 
 		ProductDTO dto = new ProductDTO();
 		dto.setName(name);
 		dto.setDescription(description);
-		dto.setCategoryId(categoryId);
+		dto.setCategoryId(parseCategoryId(request));
 
 		return dto;
 	}
 
 	private ProductVariantDTO readVariantDto(HttpServletRequest request) {
-		int productId = parseProductId(request);
-		String size = request.getParameter("size");
-		String color = request.getParameter("color");
-		String sku = request.getParameter("sku");
-		BigDecimal price = parsePrice(request);
-		int quantity = parseQuantity(request);
-
 		ProductVariantDTO dto = new ProductVariantDTO();
-		dto.setProductId(productId);
-		dto.setSize(size);
-		dto.setColor(color);
-		dto.setSku(sku);
-		dto.setPrice(price);
-		dto.setQuantity(quantity);
+		dto.setProductId(parseProductId(request));
+		dto.setSize(request.getParameter("size"));
+		dto.setColor(request.getParameter("color"));
+		dto.setSku(request.getParameter("sku"));
+		dto.setPrice(parsePrice(request));
+		dto.setQuantity(parseQuantity(request));
 		return dto;
 	}
 
@@ -311,6 +320,8 @@ public class AdminProductServlet extends HttpServlet {
 		}
 	}
 
+	// Chưa chọn danh mục hoặc giá trị sai thì trả 0 để ProductValidator báo lỗi "Vui lòng chọn danh
+	// mục".
 	private int parseCategoryId(HttpServletRequest request) {
 		try {
 			return Integer.parseInt(request.getParameter("categoryId"));
@@ -353,6 +364,7 @@ public class AdminProductServlet extends HttpServlet {
 		}
 	}
 
+	// Bắt buộc là "true" hoặc "false"; thiếu param thì báo lỗi chứ không tự ẩn sản phẩm.
 	private boolean parseActive(HttpServletRequest request) {
 		String active = request.getParameter("active");
 		if ("true".equals(active)) {

@@ -65,18 +65,6 @@ public class UserDB {
         return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 
-    public static Optional<User> findByEmailOrPhone(EntityManager em, String identifier) {
-        if (identifier == null || identifier.isBlank()) {
-            return Optional.empty();
-        }
-        String queryString = "SELECT u FROM User u WHERE LOWER(TRIM(u.email)) = LOWER(TRIM(:id)) OR TRIM(u.phone) = TRIM(:id)";
-        TypedQuery<User> query = em.createQuery(queryString, User.class);
-        query.setParameter("id", identifier.trim());
-
-        List<User> results = query.getResultList();
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
-    }
-
     // ===== Query: danh sách =====
 
     public static List<User> findAll(EntityManager em, int offset, int limit) {

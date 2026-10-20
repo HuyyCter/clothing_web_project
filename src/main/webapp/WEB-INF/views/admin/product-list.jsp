@@ -81,7 +81,7 @@
                                     <div class="admin-sidebar__user-name">Admin</div>
                                     <div class="admin-sidebar__user-role">Quản trị viên</div>
                                 </div>
-                                <a href="logout" class="admin-sidebar__logout">
+                                <a href="/logout" class="admin-sidebar__logout">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                                         <polyline points="16 17 21 12 16 7" />
@@ -103,9 +103,8 @@
                             <div class="admin-page-header">
                                 <div>
                                     <h1 class="admin-page-header__title">Sản phẩm</h1>
-                                    <p class="admin-page-header__subtitle">
-                                        Quản lý sản phẩm, kho hàng và hình ảnh của cửa hàng.
-                                    </p>
+                                    <p class="admin-page-header__subtitle">Quản lý sản phẩm, kho hàng và hình ảnh của
+                                        cửa hàng.</p>
                                 </div>
                                 <div class="admin-page-header__actions">
                                     <a href="AdminProductServlet?action=new" class="btn btn--primary">
@@ -162,14 +161,12 @@
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${product.active}">
-                                                                <span class="admin-badge admin-badge--success">
-                                                                    Đang hiển thị
-                                                                </span>
+                                                                <span class="admin-badge admin-badge--success">Đang hiển
+                                                                    thị</span>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <span class="admin-badge admin-badge--neutral">
-                                                                    Đã ẩn
-                                                                </span>
+                                                                <span class="admin-badge admin-badge--neutral">Đã
+                                                                    ẩn</span>
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </td>
@@ -201,6 +198,23 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <c:if test="${totalPages > 1}">
+                                <nav class="admin-pager" aria-label="Phân trang">
+                                    <c:if test="${currentPage > 1}">
+                                        <a href="AdminProductServlet?page=${currentPage - 1}"
+                                            class="admin-pager__item">&lsaquo;</a>
+                                    </c:if>
+                                    <c:forEach begin="1" end="${totalPages}" var="p">
+                                        <a href="AdminProductServlet?page=${p}"
+                                            class="admin-pager__item${p == currentPage ? ' admin-pager__item--active' : ''}">${p}</a>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <a href="AdminProductServlet?page=${currentPage + 1}"
+                                            class="admin-pager__item">&rsaquo;</a>
+                                    </c:if>
+                                </nav>
+                            </c:if>
                         </div>
                     </main>
                 </div>

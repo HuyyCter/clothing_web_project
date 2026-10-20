@@ -22,9 +22,11 @@ public class ProductDB {
         return em.find(Product.class, id);
     }
 
-    public static List<Product> findAll(EntityManager em) {
+    public static List<Product> findAll(EntityManager em, int offset, int limit) {
         String queryString = "SELECT p FROM Product p JOIN p.category ORDER BY p.id";
         TypedQuery<Product> query = em.createQuery(queryString, Product.class);
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
         return query.getResultList();
     }
 
@@ -72,6 +74,10 @@ public class ProductDB {
 
 
     // ==================== Phúc Nguyên ====================
+    public static List<Product> findAll(EntityManager em) {
+        String queryString = "SELECT p FROM Product p";
+        return em.createQuery(queryString, Product.class).getResultList();
+    }
 
     public static List<Product> findByCategoryId(EntityManager em, int categoryId) {
         String queryString = "SELECT p FROM Product p WHERE p.category.id = :categoryId";

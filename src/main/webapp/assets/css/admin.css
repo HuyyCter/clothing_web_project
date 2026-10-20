@@ -566,9 +566,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 34px;
-    padding: 0 16px;
-    justify-content: center;
+    padding: 8px 16px;
     border-radius: var(--radius-md);
     font-family: var(--font-sans);
     font-size: 13px;
@@ -622,9 +620,8 @@
 }
 
 .btn--sm {
-    height: 28px;
-    padding: 0 10px;
-    font-size: 13px;
+    padding: 5px 10px;
+    font-size: 12px;
 }
 
 /* ---------- Badges ---------- */

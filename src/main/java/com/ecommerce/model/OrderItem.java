@@ -21,24 +21,12 @@ public class OrderItem {
     @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "price", precision = 12, scale = 2)
-    private java.math.BigDecimal price = java.math.BigDecimal.ZERO;
-
     public OrderItem() {
     }
 
     public OrderItem(ProductVariant productVariant, int quantity) {
         this.productVariant = productVariant;
         this.quantity = quantity;
-        if (productVariant != null && productVariant.getPrice() != null) {
-            this.price = productVariant.getPrice();
-        }
-    }
-
-    public OrderItem(ProductVariant productVariant, int quantity, java.math.BigDecimal price) {
-        this.productVariant = productVariant;
-        this.quantity = quantity;
-        this.price = price;
     }
     
     // ==========================================
@@ -74,14 +62,6 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public java.math.BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(java.math.BigDecimal price) {
-        this.price = price;
     }
     
     // ==========================================
