@@ -81,7 +81,7 @@
                                     <div class="admin-sidebar__user-name">Admin</div>
                                     <div class="admin-sidebar__user-role">Quản trị viên</div>
                                 </div>
-                                <a href="/logout" class="admin-sidebar__logout">
+                                <a href="logout" class="admin-sidebar__logout">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                                         <polyline points="16 17 21 12 16 7" />
@@ -219,7 +219,7 @@
                             </form>
 
                             <c:if test="${isEdit}">
-                                <!-- Ẩn / hiện sản phẩm (form riêng, vì không được lồng form trong form) -->
+                                <!-- Ẩn / hiện sản phẩm -->
                                 <form method="post" action="AdminProductServlet" class="product-toggle-form">
                                     <input type="hidden" name="action" value="toggleActive">
                                     <input type="hidden" name="id" value="${product.id}">
@@ -442,8 +442,9 @@
                                                 placeholder="Số lượng" min="1"
                                                 value="${variantForm.quantity > 0 ? variantForm.quantity : ''}"
                                                 required>
-                                            <button type="submit" class="btn btn--primary">Thêm
-                                                loại</button>
+                                            <button type="submit" class="btn btn--primary">
+                                                Thêm loại
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -490,15 +491,17 @@
                                         class="product-add-form">
                                         <input type="hidden" name="action" value="addImage">
                                         <input type="hidden" name="productId" value="${product.id}">
-                                        <div class="admin-form-label product-add-form__title">Thêm ảnh
+                                        <div class="admin-form-label product-add-form__title">
+                                            Thêm ảnh
                                         </div>
                                         <div class="product-add-form__row">
                                             <input type="file" name="image" class="admin-form-input"
                                                 accept="image/jpeg,image/png,image/webp" required>
                                             <input type="text" name="color" class="admin-form-input"
                                                 placeholder="Màu của ảnh (vd xanh navy)" maxlength="255" required>
-                                            <button type="submit" class="btn btn--primary">Tải ảnh
-                                                lên</button>
+                                            <button type="submit" class="btn btn--primary">
+                                                Tải ảnh lên
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
