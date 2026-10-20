@@ -17,10 +17,16 @@ Thumbs.db
 .idea/
 .smarttomcat/
 
-# Local working docs (giữ local trên máy, không commit git)
+# Private Credentials & Properties
+*momo.properties
+*brevo.properties
+
+# Local working docs & Seed data (giữ local trên máy, không commit git)
 task.md
 task_updated.md
 CONTEXT_CHECK.md
 context_check.md
 HAS_CONTEXT_VERIFICATION_REPORT.md
+web-project-report.docx.md
+database/sample_test_data.sql
 /bin/
