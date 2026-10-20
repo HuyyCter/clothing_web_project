@@ -10,9 +10,6 @@ target/
 .DS_Store
 Thumbs.db
 
-# Secrets - KHÔNG BAO GIỜ commit các file properties thật
-src/main/resources/META-INF/persistence.xml
-
 # Log
 *.log
 
