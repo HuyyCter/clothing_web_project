@@ -54,7 +54,7 @@
                     <p class="pay-result__msg">
                         <c:choose>
                             <c:when test="${not empty tx.orderId}">
-                                Đơn hàng <span class="pay-mono">#${tx.orderId}</span> đã được xác nhận và đang được chuẩn bị.
+                                Đơn hàng <span class="pay-mono">#<fmt:formatNumber value="${tx.orderId}" pattern="00000" /></span> đã được xác nhận và đang được chuẩn bị.
                             </c:when>
                             <c:when test="${not empty tx.orderError}">
                                 MoMo đã nhận tiền nhưng hệ thống chưa tạo được đơn hàng.
@@ -104,11 +104,14 @@
                         <a href="${ctx}/cart" class="pay-btn pay-btn--ghost">Về giỏ hàng</a>
                     </c:when>
                     <c:when test="${variant == 'failed'}">
-                        <a href="${ctx}/payment/momo" class="pay-btn">Thử thanh toán lại</a>
+                        <a href="${ctx}/checkout" class="pay-btn">Thử thanh toán lại</a>
                         <a href="${ctx}/cart" class="pay-btn pay-btn--ghost">Về giỏ hàng</a>
                     </c:when>
                     <c:otherwise>
-                        <a href="${ctx}/" class="pay-btn">Tiếp tục mua sắm</a>
+                        <c:if test="${not empty tx.orderId}">
+                            <a href="${ctx}/profile" class="pay-btn">Xem đơn hàng của tôi</a>
+                        </c:if>
+                        <a href="${ctx}/" class="pay-btn ${not empty tx.orderId ? 'pay-btn--ghost' : ''}">Tiếp tục mua sắm</a>
                     </c:otherwise>
                 </c:choose>
             </div>

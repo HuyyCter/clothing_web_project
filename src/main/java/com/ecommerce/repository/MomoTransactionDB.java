@@ -1,6 +1,5 @@
 package com.ecommerce.repository;
 
-import com.ecommerce.model.Address;
 import com.ecommerce.model.MomoTransaction;
 import com.ecommerce.model.Payment;
 import jakarta.persistence.EntityManager;
@@ -47,16 +46,5 @@ public class MomoTransactionDB {
         q.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         List<MomoTransaction> list = q.getResultList();
         return list.isEmpty() ? null : list.get(0);
-    }
-
-    /**
-     * Danh sách địa chỉ đã lưu của user (chỉ đọc), mặc định lên đầu.
-     * Có thể thay bằng query trong AddressDB khi module User/Address bổ sung.
-     */
-    public static List<Address> findAddressesOfUser(EntityManager em, int userId) {
-        TypedQuery<Address> q = em.createQuery(
-                "SELECT a FROM Address a WHERE a.user.id = :uid ORDER BY a.isDefault DESC, a.id ASC", Address.class);
-        q.setParameter("uid", userId);
-        return q.getResultList();
     }
 }

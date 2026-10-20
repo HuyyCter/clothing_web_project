@@ -3,11 +3,10 @@ package com.ecommerce.model;
 import com.ecommerce.config.MomoConfig;
 import com.ecommerce.dto.CartDTO;
 import com.ecommerce.dto.CartItemDTO;
-import com.ecommerce.dto.MomoCheckoutRequestDTO;
+import com.ecommerce.dto.CheckoutRequestDTO;
 import com.ecommerce.dto.MomoTransactionDTO;
 import com.ecommerce.dto.PaidCheckoutDTO;
 import com.ecommerce.dto.PaidCheckoutItemDTO;
-import com.ecommerce.dto.ShippingAddressOptionDTO;
 import com.ecommerce.exception.BusinessException;
 import com.ecommerce.exception.NotFoundException;
 import com.ecommerce.exception.UnauthorizedException;
@@ -175,29 +174,18 @@ public class MomoTransaction {
     // BUSINESS METHODS
     // ==========================================
 
-    /** Địa chỉ đã lưu của user, phục vụ trang xác nhận thanh toán. */
-    public static List<ShippingAddressOptionDTO> getAddressOptions(int userId) {
-        validateUserId(userId);
-        EntityManager em = JpaUtil.getEntityManager().createEntityManager();
-        try {
-            List<ShippingAddressOptionDTO> result = new ArrayList<>();
-            for (Address a : MomoTransactionDB.findAddressesOfUser(em, userId)) {
-                result.add(ShippingAddressOptionDTO.fromEntity(a));
-            }
-            return result;
-        } finally {
-            em.close();
-        }
-    }
-
     /**
      * Bắt đầu thanh toán MoMo cho giỏ hàng hiện tại của user.
      *
+     * @param baseUrl địa chỉ gốc của website (vd https://clothing-web-project.onrender.com), dùng để
+     *                suy ra redirectUrl / ipnUrl khi không cấu hình sẵn
      * @return payUrl — Controller redirect trình duyệt của khách sang URL này
      */
-    public static String initiate(int userId, MomoCheckoutRequestDTO request) {
+    public static String initiate(int userId, CheckoutRequestDTO request, String baseUrl) {
         validateUserId(userId);
-        MomoConfig.get(); // báo lỗi cấu hình sớm, trước khi ghi DB
+        MomoConfig cfg = MomoConfig.get();
+        String redirectUrl = cfg.resolveRedirectUrl(baseUrl);
+        String ipnUrl = cfg.resolveIpnUrl(baseUrl);
 
         // ---- Bước 1: snapshot giỏ hàng + địa chỉ, lưu giao dịch PENDING ----
         MomoTransaction t;
@@ -243,7 +231,7 @@ public class MomoTransaction {
         String orderInfo = "Thanh toan don hang Fashion Shop " + t.momoOrderId;
         Map<String, Object> response;
         try {
-            response = MomoUtil.createPayment(t.momoOrderId, t.requestId, t.amount.longValue(), orderInfo, "");
+            response = MomoUtil.createPayment(t.momoOrderId, t.requestId, t.amount.longValue(), orderInfo, "", redirectUrl, ipnUrl);
         } catch (BusinessException e) {
             recordCreateResponse(t.momoOrderId, null, e.getMessage(), null);
             throw e;
@@ -494,21 +482,11 @@ public class MomoTransaction {
         }
     }
 
-    private static void snapshotShipping(EntityManager em, MomoTransaction t, int userId, MomoCheckoutRequestDTO req) {
-        if (req.getAddressId() != null) {
-            Address a = em.find(Address.class, req.getAddressId());
-            if (a == null || a.getUser() == null || a.getUser().getId() != userId) {
-                throw new NotFoundException("Không tìm thấy địa chỉ giao hàng đã chọn.");
-            }
-            t.shippingRecipientName = truncate(a.getRecipientName(), 100);
-            t.shippingPhone = truncate(a.getPhone(), 20);
-            t.shippingAddress = truncate(ShippingAddressOptionDTO.joinAddress(
-                    a.getStreet(), a.getWard(), a.getDistrict(), a.getCity()), 255);
-        } else {
-            t.shippingRecipientName = truncate(req.getRecipientName().trim(), 100);
-            t.shippingPhone = truncate(req.getPhone().trim(), 20);
-            t.shippingAddress = truncate(req.getShippingAddress().trim(), 255);
-        }
+    private static void snapshotShipping(EntityManager em, MomoTransaction t, int userId, CheckoutRequestDTO req) {
+        String[] shipping = Order.resolveShipping(em, userId, req);
+        t.shippingRecipientName = shipping[0];
+        t.shippingPhone = shipping[1];
+        t.shippingAddress = shipping[2];
         t.note = (req.getNote() != null && !req.getNote().trim().isEmpty()) ? truncate(req.getNote().trim(), 255) : null;
     }
 
