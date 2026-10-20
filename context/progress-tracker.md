@@ -55,6 +55,25 @@ change.
   + **Tách CSS 100% ra khỏi JSP**: Loại bỏ toàn bộ thẻ `<style>` và thuộc tính `style="..."` trong tất cả các file JSP thuộc phạm vi của A (`login.jsp`, `register.jsp`, `forgot-password.jsp`, `profile.jsp`, `error-403.jsp`, thanh auth `index.jsp`). Toàn bộ được quy hoạch về file CSS chuyên biệt (`auth.css`, `customer.css`, `error.css`, `common.css`).
   + **Tuân thủ MVC**: Controller thuần túy tiếp nhận request/response, validation, DTO mapping và gọi Repository/Service; View (JSP) sử dụng 100% JSTL/EL và `c:out` (chống XSS), không chứa Java scriptlets (`<% %>`).
   + **Tuân thủ Context & Quy chuẩn**: Password băm BCrypt, PreparedStatements chống SQLi, OTP bảo mật (TTL 120s, cooldown 30s, tối đa 3 lần thử), hỗ trợ URL động môi trường production qua header proxy / env variable.
+- [x] **Cơ sở dữ liệu mẫu cục bộ (Seed Test Data)**:
+  + Tạo script `database/sample_test_data.sql` và nạp thành công vào cơ sở dữ liệu `clothing_web` trên PostgreSQL 18 local:
+  + Gồm 9 Users (Admin, Customer có mật khẩu BCrypt), 6 Categories, 12 Products, 35 Product Variants (AVAILABLE, SOLD, DISCONTINUED), 20 Product Images, 5 Vouchers (hoạt động, hết hạn, chạm giới hạn), 3 Addresses, 2 Carts kèm Cart Items, 6 Orders đủ cả 5 trạng thái (PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED), 7 Order Items, 3 Reviews, Wishlists và Momo Transaction.
+  + Đã tự động cập nhật lại toàn bộ Sequence ID của PostgreSQL để tránh xung đột khi sinh dữ liệu mới trong quá trình kiểm thử.
+- [x] **Đồng bộ thanh điều hướng Admin Sidebar trên toàn bộ các trang quản trị**:
+  + Thêm link "Trang chủ Admin" (`/admin-home.jsp`) và "Xem trang bán hàng" (`/`) vào nhóm Tổng quan trên toàn bộ 10 file JSP Admin (`dashboard.jsp`, `voucher-*.jsp`, `category-*.jsp`, `product-*.jsp`, `order-*.jsp`, `admin-home.jsp`).
+  + Chuyển đổi logo Brand `Fashion. Admin Panel` thành link click được dẫn về `admin-home.jsp`.
+  + Chuẩn hóa nút logout ở footer sidebar (`${pageContext.request.contextPath}/logout`).
+- [x] **Sửa lỗi điều hướng Admin, Checkout giỏ hàng và Dropdown tài khoản**:
+  + **Admin Dashboard**: Cập nhật nút "Xem tất cả" và các link đơn hàng gần đây trỏ đúng về `AdminOrderServlet` (thay vì `/admin/orders` gây lỗi 404).
+  + **Checkout Giỏ hàng**: Bổ sung mapping `/checkout` vào `MomoPaymentServlet.java` để nút "Tiến hành thanh toán" trong `cart.jsp` mở trang xác nhận địa chỉ và giỏ hàng thanh toán liền mạch.
+  + **Navbar Giỏ hàng & Thanh toán**: Đồng bộ dropdown menu tài khoản trong `cart.jsp` và `_navbar.jspf` với `index.jsp` (hiển thị đúng tên, menu thả xuống Hồ sơ, Trang quản trị, Đăng xuất; sửa lỗi thẻ `<a>` nhảy sang `/login`).
+- [x] **Đồng bộ điều hướng Admin trên giao diện cửa hàng (`index.jsp`, `profile.jsp`, `admin-home.jsp`)**:
+  + Bổ sung liên kết "Trang quản trị" (`/admin-home.jsp`) vào dropdown người dùng trong `index.jsp` và `profile.jsp` khi phiên đăng nhập có vai trò `role == 'ADMIN'`.
+  + Bổ sung nút "Xem trang bán hàng" vào sidebar `admin-home.jsp` và chuẩn hóa đường dẫn đăng xuất với context path (`${pageContext.request.contextPath}/logout`).
+- [x] **Tích hợp Brevo (Sendinblue) REST API v3 thay thế SMTP**:
+  + Thay thế gửi email qua giao thức SMTP (bị Render Free Tier chặn outbound port 25, 465, 587) bằng **Brevo REST API v3 qua HTTPS (port 443)** trong `MailUtil.java`.
+  + Hỗ trợ cấu hình linh hoạt qua biến môi trường (`BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`) trên Render Dashboard hoặc file `brevo.properties` (được cung cấp mẫu `brevo.properties.example` và ẩn trong `.gitignore`).
+  + Cơ chế tự động fallback thông minh sang Gmail SMTP (khi chạy local nếu chưa có key Brevo) và cơ chế in OTP ra console log kèm cờ `ALLOW_CONSOLE_OTP=true` phục vụ kiểm thử / demo.
 
 ## In Progress
 

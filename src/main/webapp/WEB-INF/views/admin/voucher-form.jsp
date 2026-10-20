@@ -19,7 +19,7 @@
             <body>
                 <div class="admin-shell">
                     <aside class="admin-sidebar">
-                        <div class="admin-sidebar__brand">
+                        <a href="${pageContext.request.contextPath}/admin-home.jsp" class="admin-sidebar__brand" style="text-decoration:none;">
                             <div class="admin-sidebar__logo-icon">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
                                     stroke-width="2">
@@ -32,19 +32,35 @@
                                 <div class="admin-sidebar__brand-name">Fashion.</div>
                                 <span class="admin-sidebar__brand-sub">Admin Panel</span>
                             </div>
-                        </div>
+                        </a>
                         <nav class="admin-sidebar__nav">
                             <div class="admin-sidebar__section-label">Tổng quan</div>
-                            <a href="AdminDashboardServlet" class="admin-nav__item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="7" height="7" />
-                                    <rect x="14" y="3" width="7" height="7" />
-                                    <rect x="14" y="14" width="7" height="7" />
-                                    <rect x="3" y="14" width="7" height="7" />
-                                </svg>
-                                Dashboard
-                            </a>
-                            <div class="admin-sidebar__section-label">Quản lý</div>
+                            <a href="${pageContext.request.contextPath}/admin-home.jsp" class="admin-nav__item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                        Trang chủ Admin
+                    </a>
+                    <a href="AdminDashboardServlet" class="admin-nav__item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="${pageContext.request.contextPath}/" class="admin-nav__item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
+                        </svg>
+                        Xem trang bán hàng
+                    </a>
+                    <div class="admin-sidebar__section-label">Quản lý</div>
                             <a href="AdminCategoryServlet" class="admin-nav__item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path
@@ -81,7 +97,7 @@
                                     <div class="admin-sidebar__user-name">Admin</div>
                                     <div class="admin-sidebar__user-role">Quản trị viên</div>
                                 </div>
-                                <a href="/logout" class="admin-sidebar__logout">
+                                <a href="${pageContext.request.contextPath}/logout" class="admin-sidebar__logout">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                                         <polyline points="16 17 21 12 16 7" />
