@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * Servlet Filter implementation class GlobalExceptionFilter
  */
-@WebFilter("/GlobalExceptionFilter")
+@WebFilter("/*")
 public class GlobalExceptionFilter extends HttpFilter implements Filter {
 	private static final long serialVersionUID = 1L;
 
