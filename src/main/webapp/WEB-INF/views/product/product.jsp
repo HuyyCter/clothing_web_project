@@ -437,11 +437,7 @@
                                     <c:when test="${minVariantPrices[product.id] != null}">
                                         Từ
                                         <c:out value="${minVariantPrices[product.id]}" /> VNĐ
-                                    </c:when>
-
-                                    <c:otherwise>
-                                        <c:out value="${product.price}" /> VNĐ
-                                    </c:otherwise>
+                                    </c:when>                                  
                                 </c:choose>
                             </p>
                             <button
