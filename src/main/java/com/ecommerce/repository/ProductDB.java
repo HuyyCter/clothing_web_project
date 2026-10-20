@@ -22,11 +22,9 @@ public class ProductDB {
         return em.find(Product.class, id);
     }
 
-    public static List<Product> findAll(EntityManager em, int offset, int limit) {
+    public static List<Product> findAll(EntityManager em) {
         String queryString = "SELECT p FROM Product p JOIN p.category ORDER BY p.id";
         TypedQuery<Product> query = em.createQuery(queryString, Product.class);
-        query.setFirstResult(offset);
-        query.setMaxResults(limit);
         return query.getResultList();
     }
 
