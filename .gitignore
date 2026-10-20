@@ -10,9 +10,6 @@ target/
 .DS_Store
 Thumbs.db
 
-# Secrets - KHÔNG BAO GIỜ commit các file properties thật
-src/main/resources/META-INF/persistence.xml
-
 # Log
 *.log
 
@@ -22,6 +19,8 @@ src/main/resources/META-INF/persistence.xml
 
 # Local working docs (giữ local trên máy, không commit git)
 task.md
+task_updated.md
 CONTEXT_CHECK.md
 context_check.md
 HAS_CONTEXT_VERIFICATION_REPORT.md
+/bin/
