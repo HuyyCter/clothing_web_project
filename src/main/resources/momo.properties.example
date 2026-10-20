@@ -1,0 +1,39 @@
+# =====================================================================
+# Cấu hình cổng thanh toán MoMo (API v2 - One-Time Payment)
+# Cách dùng: copy file này thành "momo.properties" (cùng thư mục) rồi
+# sửa lại cho đúng máy của bạn.
+#
+# 3 giá trị partnerCode / accessKey / secretKey dưới đây là KHÓA TEST
+# CÔNG KHAI do MoMo đăng trong repo mẫu chính thức
+# (github.com/momo-wallet/payment) — chỉ chạy được trên SANDBOX.
+# Khi lên production phải thay bằng khóa thật lấy từ business.momo.vn
+# và KHÔNG commit file momo.properties thật lên git.
+# =====================================================================
+
+momo.partnerCode=MOMO
+momo.accessKey=F8BBA842ECF85
+momo.secretKey=K951B6PE1waDMi640xX08PD3vg6EkVlz
+
+# Sandbox: https://test-payment.momo.vn  |  Production: https://payment.momo.vn
+momo.endpoint=https://test-payment.momo.vn
+
+# URL MoMo chuyển TRÌNH DUYỆT của khách về sau khi thanh toán.
+# Phải khớp context path khi deploy (mặc định /ecommerce-web).
+momo.redirectUrl=http://localhost:8080/ecommerce-web/payment/momo/return
+
+# URL MoMo gọi SERVER-TO-SERVER (IPN). MoMo không gọi được "localhost",
+# nên khi test local hãy dùng ngrok/cloudflared rồi dán URL public vào đây,
+# vd: https://abcd-1234.ngrok-free.app/ecommerce-web/payment/momo/ipn
+# Nếu để localhost thì hệ thống vẫn chạy được nhờ cơ chế đối soát
+# (query API) khi khách quay về redirectUrl.
+momo.ipnUrl=http://localhost:8080/ecommerce-web/payment/momo/ipn
+
+# payWithMethod: trang MoMo cho chọn Ví MoMo / thẻ ATM / thẻ Visa-Master (dễ test bằng thẻ test)
+# captureWallet: chỉ thanh toán bằng ví MoMo (quét QR bằng app MoMo Test)
+momo.requestType=payWithMethod
+
+# Ngôn ngữ trang thanh toán / message trả về: vi hoặc en
+momo.lang=vi
+
+# Timeout gọi API MoMo (giây) — MoMo khuyến nghị tối thiểu 30s
+momo.timeoutSeconds=30
