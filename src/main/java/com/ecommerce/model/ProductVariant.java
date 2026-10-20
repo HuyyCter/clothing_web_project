@@ -235,7 +235,7 @@ public class ProductVariant {
             if (type == null) {
                 type = ProductVariantDTO.fromEntity(variant);
                 type.setQuantity(0);
-                type.setStatus(ProductVariantStatus.SOLD); // mặc định thấp nhất, sẽ được nâng lên bên dưới
+                type.setStatus(ProductVariantStatus.SOLD);
                 types.put(key, type);
             }
 
