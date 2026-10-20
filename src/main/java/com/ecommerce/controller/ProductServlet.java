@@ -84,15 +84,11 @@ public class ProductServlet extends HttpServlet {
                 products = ProductDB.findPage(em, search, categoryId, sort, page, PAGE_SIZE);
             }
 
-
             // =========================
-            // GET MINIMUM VARIANT PRICES & FIRST IMAGES
+            // GET MINIMUM VARIANT PRICES
             // =========================
-            Map<Integer, BigDecimal> minVariantPrices =
-                    ProductDB.findMinVariantPrices(em, products);
-
-            Map<Integer, String> firstImageUrls =
-                    ProductDB.findFirstImageUrls(em, products);
+            Map<Integer, BigDecimal> minVariantPrices = ProductDB.findMinVariantPrices(em, products);
+            Map<Integer, String> firstImageUrls = ProductDB.findFirstImageUrls(em, products);
 
             // =========================
             // GET WISHLIST
@@ -104,21 +100,22 @@ public class ProductServlet extends HttpServlet {
                 Object sessionUserId = session.getAttribute("userId");
 
                 if (sessionUserId instanceof Integer) {
-                    userId = (Integer) sessionUserId;
+                    userId = (Integer)sessionUserId;
                 }
             }
 
             Set<Integer> favoriteProductIds = new HashSet<>();
 
-            if (userId != null) {
-                List<WishlistItem> wishlistItems =
-                        WishlistDB.findByUserId(em, userId);
+            // Tạm dùng user ID = 1 để đồng bộ với WishlistServlet
+            // hiện đang dùng cho mục đích test local.
+            if (userId == null) {
+                userId = 1;
+            }
 
-                for (WishlistItem item : wishlistItems) {
-                    if (item.getProduct() != null) {
-                        favoriteProductIds.add(item.getProduct().getId());
-                    }
-                }
+            List<WishlistItem> wishlistItems = WishlistDB.findByUserId(em, userId);
+
+            for (WishlistItem item : wishlistItems) {
+                favoriteProductIds.add(item.getProduct().getId());
             }
 
             // =========================
@@ -134,6 +131,7 @@ public class ProductServlet extends HttpServlet {
             request.setAttribute("sort", sort);
             request.setAttribute("minVariantPrices", minVariantPrices);
             request.setAttribute("firstImageUrls", firstImageUrls);
+
             // =========================
             // FORWARD
             // =========================

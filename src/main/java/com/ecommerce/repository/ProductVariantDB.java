@@ -29,23 +29,7 @@ public class ProductVariantDB {
         query.setParameter("productId", productId);
         return query.getResultList();
     }
-    public static List<ProductVariant> findAvailableByProductId(
-            EntityManager em, int productId) {
 
-        String queryString =
-                "SELECT pv FROM ProductVariant pv " +
-                "WHERE pv.product.id = :productId " +
-                "AND pv.status = :status " +
-                "ORDER BY pv.size, pv.color, pv.id";
-
-        TypedQuery<ProductVariant> query =
-                em.createQuery(queryString, ProductVariant.class);
-
-        query.setParameter("productId", productId);
-        query.setParameter("status", ProductVariantStatus.AVAILABLE);
-
-        return query.getResultList();
-    }
     public static boolean isSkuExists(EntityManager em, String sku) {
         String queryString = "SELECT COUNT(pv) FROM ProductVariant pv WHERE pv.sku = :sku";
         TypedQuery<Long> query = em.createQuery(queryString, Long.class);
@@ -123,24 +107,4 @@ public class ProductVariantDB {
         String queryString = "SELECT pv FROM ProductVariant pv ORDER BY pv.id DESC";
         return em.createQuery(queryString, ProductVariant.class).getResultList();
     }
-
-	public static List<BigDecimal> findAvailablePriceRangeByProductId(
-	        EntityManager em, int productId) {
-	
-	    String queryString =
-	            "SELECT MIN(pv.price), MAX(pv.price) " +
-	            "FROM ProductVariant pv " +
-	            "WHERE pv.product.id = :productId " +
-	            "AND pv.status = :status";
-	
-	    Object[] result = (Object[]) em.createQuery(queryString)
-	            .setParameter("productId", productId)
-	            .setParameter("status", ProductVariantStatus.AVAILABLE)
-	            .getSingleResult();
-	
-	    BigDecimal minPrice = (BigDecimal) result[0];
-	    BigDecimal maxPrice = (BigDecimal) result[1];
-	
-	    return java.util.Arrays.asList(minPrice, maxPrice);
-	}
 }

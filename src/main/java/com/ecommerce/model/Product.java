@@ -201,16 +201,13 @@ public class Product {
             }
 
             ProductDTO dto = ProductDTO.fromEntity(product);
+            List<ProductVariant> variants = ProductVariantDB.findByProductId(em, id);
+            List<ProductImage> images = ProductImageDB.findByProductId(em, id);
 
-            List<ProductImageDTO> images = new ArrayList<>();
-            for (ProductImage image : ProductImageDB.findByProductId(em, id)) {
-                images.add(ProductImageDTO.fromEntity(image));
-            }
-            dto.setImages(images);
+            dto.setVariants(ProductVariant.groupVariantByTypeToDTOs(variants));
+            dto.setImages(ProductImage.toDTOs(images));
 
-            dto.setVariants(ProductVariant.toTypeDTOs(ProductVariantDB.findByProductId(em, id)));
             return dto;
-
         } catch (RuntimeException e) {
             throw e;
         } finally {
@@ -218,12 +215,12 @@ public class Product {
         }
     }
 
-    public static List<ProductDTO> getAll(int offset, int limit) {
+    public static List<ProductDTO> getAll() {
         EntityManager em = JpaUtil.getEntityManager().createEntityManager();
 
         try {
             List<ProductDTO> products = new ArrayList<>();
-            for (Product product : ProductDB.findAll(em, offset, limit)) {
+            for (Product product : ProductDB.findAll(em)) {
                 products.add(ProductDTO.fromEntity(product));
             }
             return products;

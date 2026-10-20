@@ -1,9 +1,4 @@
 package com.ecommerce.controller;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.ecommerce.repository.ProductVariantDB;
 
 import com.ecommerce.model.WishlistItem;
 import com.ecommerce.repository.WishlistDB;
@@ -28,8 +23,8 @@ public class WishlistServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    	HttpSession session = request.getSession(false);
-    	Integer userId = getUserId(session);
+        HttpSession session = request.getSession();
+        Integer userId = getUserId(session);
 
         if (userId == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Phiên đăng nhập không hợp lệ.");
@@ -39,31 +34,10 @@ public class WishlistServlet extends HttpServlet {
         EntityManager entityManager = JpaUtil.getEntityManager().createEntityManager();
 
         try {
-			
-			List<WishlistItem> wishlistItems =
-			        WishlistDB.findByUserId(entityManager, userId);
-			
-			Map<Integer, List<BigDecimal>> priceRanges = new HashMap<>();
-			
-			for (WishlistItem item : wishlistItems) {
-			    int productId = item.getProduct().getId();
+            List<WishlistItem> wishlistItems = WishlistDB.findByUserId(entityManager, userId);
 
-			    List<BigDecimal> priceRange =
-			            ProductVariantDB.findAvailablePriceRangeByProductId(
-			                    entityManager, productId);
+            request.setAttribute("wishlistItems", wishlistItems);
 
-			    priceRanges.put(productId, priceRange);
-
-			    System.out.println(
-			            "[WISHLIST PRICE] productId=" + productId
-			            + ", priceRange=" + priceRange
-			    );
-			}
-
-			System.out.println("[WISHLIST PRICE] priceRanges=" + priceRanges);
-
-			request.setAttribute("wishlistItems", wishlistItems);
-			request.setAttribute("priceRanges", priceRanges);
             request.getRequestDispatcher("/WEB-INF/views/wishlist/wishlist.jsp").forward(request, response);
 
         } finally {
@@ -136,7 +110,7 @@ public class WishlistServlet extends HttpServlet {
                 return;
             }
 
-            response.sendRedirect(request.getContextPath() + "/wishlist/toggle");
+            response.sendRedirect(request.getContextPath() + "/wishlist");
 
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -148,32 +122,10 @@ public class WishlistServlet extends HttpServlet {
         } finally {
             entityManager.close();
         }
-        System.out.println("Session exists = " + (session != null));
-        System.out.println("Session userId = "
-                + (session != null ? session.getAttribute("userId") : null));
-        System.out.println("Resolved userId = " + userId);
     }
 
     private Integer getUserId(HttpSession session) {
-        if (session == null) {
-            return null;
-        }
-
-        Object value = session.getAttribute("userId");
-
-        if (value instanceof Integer) {
-            return (Integer) value;
-        }
-
-        if (value instanceof Long) {
-            Long id = (Long) value;
-
-            if (id > 0 && id <= Integer.MAX_VALUE) {
-                return id.intValue();
-            }
-        }
-
-        return null;
+        // Chỉ dùng để test local khi chưa có Auth
+        return 1; // Thay bằng ID user test thực tế
     }
-    
 }
