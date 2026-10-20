@@ -1,22 +1,120 @@
 package com.ecommerce.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Properties;
 
+/**
+ * Utility hỗ trợ gửi email thông báo và mã OTP.
+ * Ưu tiên gửi qua Brevo REST API v3 (Port 443 HTTPS) để tránh tình trạng Render Free Tier
+ * chặn các cổng SMTP truyền thống (25, 465, 587).
+ * Tự động fallback sang SMTP Gmail nếu chưa thiết lập Brevo API Key.
+ */
 public class MailUtil {
 
     private static final String DEFAULT_FROM_EMAIL = "anhhaduy1906@gmail.com";
     private static final String DEFAULT_FROM_NAME = "Fashion Shop";
     private static final String DEFAULT_APP_PASSWORD = "mqnn xgug vkyh ofqo";
 
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+    private static final String BREVO_CONFIG_FILE = "brevo.properties";
+
+    /**
+     * Nạp cấu hình từ file brevo.properties trong classpath (nếu có).
+     */
+    private static Properties loadBrevoProperties() {
+        Properties props = new Properties();
+        try (InputStream in = MailUtil.class.getClassLoader().getResourceAsStream(BREVO_CONFIG_FILE)) {
+            if (in != null) {
+                props.load(in);
+            }
+        } catch (Exception ignored) {
+        }
+        return props;
+    }
+
+    /**
+     * Lấy Brevo API Key theo thứ tự ưu tiên:
+     * 1. Biến môi trường BREVO_API_KEY (trên Render / Production)
+     * 2. Java System Property BREVO_API_KEY
+     * 3. File brevo.properties trong classpath
+     */
+    public static String getBrevoApiKey() {
+        String envKey = System.getenv("BREVO_API_KEY");
+        if (envKey != null && !envKey.isBlank()) {
+            return envKey.trim();
+        }
+
+        String sysProp = System.getProperty("BREVO_API_KEY");
+        if (sysProp != null && !sysProp.isBlank()) {
+            return sysProp.trim();
+        }
+
+        Properties props = loadBrevoProperties();
+        String fileKey = props.getProperty("brevo.apiKey");
+        if (fileKey == null || fileKey.isBlank()) {
+            fileKey = props.getProperty("api_key");
+        }
+        if (fileKey != null && !fileKey.isBlank()) {
+            return fileKey.trim();
+        }
+
+        return null;
+    }
+
+    /**
+     * Lấy email người gửi (phải là email đã được kích hoạt/xác minh trên Brevo).
+     */
+    public static String getSenderEmail() {
+        String envEmail = System.getenv("BREVO_SENDER_EMAIL");
+        if (envEmail != null && !envEmail.isBlank()) return envEmail.trim();
+
+        envEmail = System.getenv("MAIL_USERNAME");
+        if (envEmail != null && !envEmail.isBlank()) return envEmail.trim();
+
+        Properties props = loadBrevoProperties();
+        String fileEmail = props.getProperty("brevo.senderEmail");
+        if (fileEmail == null || fileEmail.isBlank()) fileEmail = props.getProperty("sender_email");
+        if (fileEmail != null && !fileEmail.isBlank()) return fileEmail.trim();
+
+        return DEFAULT_FROM_EMAIL;
+    }
+
+    /**
+     * Lấy tên người gửi hiển thị (mặc định "Fashion Shop").
+     */
+    public static String getSenderName() {
+        String envName = System.getenv("BREVO_SENDER_NAME");
+        if (envName != null && !envName.isBlank()) return envName.trim();
+
+        envName = System.getenv("MAIL_FROM_NAME");
+        if (envName != null && !envName.isBlank()) return envName.trim();
+
+        Properties props = loadBrevoProperties();
+        String fileName = props.getProperty("brevo.senderName");
+        if (fileName == null || fileName.isBlank()) fileName = props.getProperty("sender_name");
+        if (fileName != null && !fileName.isBlank()) return fileName.trim();
+
+        return DEFAULT_FROM_NAME;
+    }
+
     /**
      * Xác định đường dẫn gốc (Base URL) của ứng dụng.
-     * Khi deploy lên server thật (production), chỉ cần đặt biến môi trường APP_BASE_URL (ví dụ: https://myfashion.com).
+     * Khi deploy lên server thật (production), chỉ cần đặt biến môi trường APP_BASE_URL (ví dụ: https://myfashion.onrender.com).
      * Mặc định ở môi trường dev cục bộ sẽ tự động sinh theo thông tin của request.
      */
     public static String getAppBaseUrl(HttpServletRequest request) {
@@ -45,7 +143,88 @@ public class MailUtil {
         return "http://localhost:8080";
     }
 
-    public static void sendMail(String to, String subject, String body, boolean bodyIsHTML) throws MessagingException, UnsupportedEncodingException {
+    /**
+     * Gửi email chung: Ưu tiên Brevo REST API (HTTPS Port 443).
+     * Nếu chưa cấu hình Brevo API Key, tự động chuyển sang Gmail SMTP (cổng 465).
+     */
+    public static void sendMail(String to, String subject, String body, boolean bodyIsHTML) throws Exception {
+        String brevoApiKey = getBrevoApiKey();
+        String senderEmail = getSenderEmail();
+        String senderName = getSenderName();
+
+        if (brevoApiKey != null && !brevoApiKey.isBlank()) {
+            boolean sent = sendViaBrevoApi(to, subject, body, bodyIsHTML, brevoApiKey, senderEmail, senderName);
+            if (sent) {
+                return;
+            }
+            throw new RuntimeException("Gửi email qua Brevo API thất bại.");
+        }
+
+        // Nếu chưa cấu hình Brevo API Key, fallback sang SMTP Gmail
+        System.out.println("[MailUtil] Chưa phát hiện cấu hình BREVO_API_KEY, fallback gửi qua Gmail SMTP...");
+        sendViaSmtp(to, subject, body, bodyIsHTML);
+    }
+
+    /**
+     * Gửi email thông qua Brevo REST API v3 (POST https://api.brevo.com/v3/smtp/email).
+     */
+    private static boolean sendViaBrevoApi(String to, String subject, String body, boolean bodyIsHTML,
+                                          String apiKey, String senderEmail, String senderName) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode root = mapper.createObjectNode();
+
+            ObjectNode sender = root.putObject("sender");
+            sender.put("name", senderName);
+            sender.put("email", senderEmail);
+
+            ArrayNode toArray = root.putArray("to");
+            ObjectNode recipient = toArray.addObject();
+            recipient.put("email", to);
+
+            root.put("subject", subject);
+            if (bodyIsHTML) {
+                root.put("htmlContent", body);
+            } else {
+                root.put("textContent", body);
+            }
+
+            String requestBody = mapper.writeValueAsString(root);
+
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BREVO_API_URL))
+                    .header("accept", "application/json")
+                    .header("api-key", apiKey)
+                    .header("content-type", "application/json")
+                    .timeout(Duration.ofSeconds(15))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println("[MailUtil] Gửi email thành công qua Brevo API tới " + to);
+                return true;
+            } else {
+                System.err.println("[MailUtil] Brevo API trả về mã lỗi HTTP " + response.statusCode() + ": " + response.body());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("[MailUtil] Ngoại lệ khi gọi Brevo API: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Gửi email thông qua Gmail SMTP (cổng 465 SSL).
+     */
+    private static void sendViaSmtp(String to, String subject, String body, boolean bodyIsHTML)
+            throws MessagingException, UnsupportedEncodingException {
         String from = System.getenv("MAIL_USERNAME");
         if (from == null || from.isBlank()) {
             from = DEFAULT_FROM_EMAIL;
@@ -83,7 +262,6 @@ public class MailUtil {
             message.setText(body);
         }
 
-        // Đổi tên người gửi hiển thị thành "Fashion Shop" (hoặc biến môi trường cấu hình)
         Address fromAddress = new InternetAddress(from, fromName, "UTF-8");
         Address toAddress = new InternetAddress(to);
         message.setFrom(fromAddress);
@@ -136,16 +314,27 @@ public class MailUtil {
         } catch (Throwable e) {
             System.err.println("[MailUtil] Lỗi gửi email OTP tới " + toEmail + ": " + e.getMessage());
             e.printStackTrace();
+
+            // In mã OTP ra màn hình server log (Rất hữu ích khi xem logs trên Render Dashboard)
+            System.out.println("==================================================================");
+            System.out.println("[DEMO / DEBUG OTP] Không gửi được mail tới: " + toEmail);
+            System.out.println("[DEMO / DEBUG OTP] Mã xác thực OTP là: " + otpCode);
+            System.out.println("[DEMO / DEBUG OTP] Hãy cấu hình biến BREVO_API_KEY trên Render hoặc tạo brevo.properties");
+            System.out.println("==================================================================");
+
+            // Cho phép bypass khi bật biến môi trường ALLOW_CONSOLE_OTP=true trên server test
+            String allowConsoleOtp = System.getenv("ALLOW_CONSOLE_OTP");
+            if ("true".equalsIgnoreCase(allowConsoleOtp)) {
+                System.out.println("[DEMO / DEBUG OTP] Chế độ ALLOW_CONSOLE_OTP=true đang bật. Cho phép tiếp tục luồng xác thực.");
+                return true;
+            }
+
             return false;
         }
     }
 
     /**
      * Gửi email thông báo Đăng ký tài khoản thành công kèm lời chào và link website.
-     * @param toEmail email người dùng vừa đăng ký
-     * @param fullName họ và tên người dùng
-     * @param websiteUrl đường dẫn tới trang web
-     * @return true nếu gửi thành công, false nếu có lỗi
      */
     public static boolean sendWelcomeEmail(String toEmail, String fullName, String websiteUrl) {
         try {
