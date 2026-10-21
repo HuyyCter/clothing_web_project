@@ -1140,14 +1140,14 @@
                 button.disabled = true;
 
                 try {
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                        }
-                    });
+                	const response = await fetch(form.getAttribute('action'), {
+                	    method: 'POST',
+                	    body: formData,
+                	    headers: {
+                	        'X-Requested-With': 'XMLHttpRequest',
+                	        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                	    }
+                	});
 
                     if (!response.ok || response.redirected) {
                         throw new Error('HTTP ' + response.status);
