@@ -30,23 +30,79 @@
                     </c:if>
                 </a>
                 <div class="navbar__divider"></div>
-                <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Tài khoản">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                    </svg>
-                    <span id="logoText">
-                        <c:choose>
-                            <c:when test="${not empty sessionScope.user}">
-                                <c:out value="${sessionScope.user.fullName}" />
-                            </c:when>
-                            <c:when test="${not empty sessionScope.logoName}">
-                                <c:out value="${sessionScope.logoName}" />
-                            </c:when>
-                            <c:otherwise>Tài khoản</c:otherwise>
-                        </c:choose>
-                    </span>
-                </a>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        <div class="navbar__user-dropdown" id="userDropdown">
+                            <button type="button" class="navbar__user-link navbar__user-dropdown-toggle"
+                                id="userDropdownBtn" aria-expanded="false" title="Tài khoản">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                <span id="logoText">
+                                    <c:out
+                                        value="${not empty sessionScope.user.fullName ? sessionScope.user.fullName : (not empty sessionScope.logoName ? sessionScope.logoName : 'Tài khoản')}" />
+                                </span>
+                            </button>
+                            <div class="navbar__user-menu" id="userMenuPanel">
+                                <c:if test="${sessionScope.role == 'ADMIN' || sessionScope.user.role == 'ADMIN'}">
+                                    <a href="${ctx}/admin-home.jsp" class="navbar__admin-link">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                                            <rect x="3" y="3" width="7" height="7" />
+                                            <rect x="14" y="3" width="7" height="7" />
+                                            <rect x="14" y="14" width="7" height="7" />
+                                            <rect x="3" y="14" width="7" height="7" />
+                                        </svg>
+                                        Trang quản trị
+                                    </a>
+                                </c:if>
+                                <a href="${ctx}/profile">Hồ sơ</a>
+                                <a href="${ctx}/logout" class="navbar__logout-link">Đăng xuất</a>
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="navbar__guest-group">
+                            <a href="${ctx}/login" class="navbar__user-link" id="navUserLink" title="Đăng nhập">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                    <polyline points="10 17 15 12 10 7" />
+                                    <line x1="15" y1="12" x2="3" y2="12" />
+                                </svg>
+                                <span id="logoText">Đăng nhập</span>
+                            </a>
+                            <span class="navbar__guest-divider">|</span>
+                            <a href="${ctx}/register" class="navbar__user-link" id="navRegisterLink" title="Đăng ký tài khoản">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="8.5" cy="7" r="4" />
+                                </svg>
+                                <span>Đăng ký</span>
+                            </a>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </nav>
         </div>
     </header>
+
+    <script>
+        (function() {
+            var userDropdown = document.getElementById('userDropdown');
+            var userDropdownBtn = document.getElementById('userDropdownBtn');
+            if (userDropdown && userDropdownBtn) {
+                userDropdownBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var isOpen = userDropdown.classList.toggle('is-open');
+                    userDropdownBtn.setAttribute('aria-expanded', isOpen);
+                });
+                document.addEventListener('click', function (e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('is-open');
+                        userDropdownBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        })();
+    </script>
