@@ -110,10 +110,10 @@ public final class MomoUtil {
      * (resultCode, message, payUrl, deeplink, qrCodeUrl...).
      */
     public static Map<String, Object> createPayment(String orderId, String requestId, long amount, String orderInfo,
-            String extraData) {
+            String extraData, String redirectUrl, String ipnUrl) {
         MomoConfig cfg = MomoConfig.get();
-        String raw = buildCreateRawSignature(cfg.getAccessKey(), amount, extraData, cfg.getIpnUrl(), orderId,
-                orderInfo, cfg.getPartnerCode(), cfg.getRedirectUrl(), requestId, cfg.getRequestType());
+        String raw = buildCreateRawSignature(cfg.getAccessKey(), amount, extraData, ipnUrl, orderId,
+                orderInfo, cfg.getPartnerCode(), redirectUrl, requestId, cfg.getRequestType());
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("partnerCode", cfg.getPartnerCode());
@@ -123,8 +123,8 @@ public final class MomoUtil {
         body.put("amount", amount);
         body.put("orderId", orderId);
         body.put("orderInfo", orderInfo);
-        body.put("redirectUrl", cfg.getRedirectUrl());
-        body.put("ipnUrl", cfg.getIpnUrl());
+        body.put("redirectUrl", redirectUrl);
+        body.put("ipnUrl", ipnUrl);
         body.put("requestType", cfg.getRequestType());
         body.put("extraData", extraData);
         body.put("lang", cfg.getLang());

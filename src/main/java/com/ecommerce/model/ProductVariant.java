@@ -167,7 +167,8 @@ public class ProductVariant {
                 throw new NotFoundException("Không tìm thấy loại size " + size + " / màu " + color + ".");
             }
 
-            boolean discontinued = ProductVariantDB.countVariantByStatus(em, productId, size, color, ProductVariantStatus.DISCONTINUED) > 0;
+            boolean discontinued = ProductVariantDB.countVariantByStatus(em, productId, size, color, ProductVariantStatus.AVAILABLE) == 0
+                    && ProductVariantDB.countVariantByStatus(em, productId, size, color, ProductVariantStatus.DISCONTINUED) > 0;
             ProductVariantStatus status = discontinued ? ProductVariantStatus.DISCONTINUED : ProductVariantStatus.AVAILABLE;
 
             Product product = ProductDB.findById(em, productId);
@@ -225,24 +226,24 @@ public class ProductVariant {
                 "Loại này không có chiếc nào đang ngừng bán để bán lại.");
     }
 
-    public static List<ProductVariantDTO> groupVariantByTypeToDTOs(List<ProductVariant> variants) {
+    public static List<ProductVariantDTO> toTypeDTOs(List<ProductVariant> rows) {
         Map<String, ProductVariantDTO> types = new LinkedHashMap<>();
 
-        for (ProductVariant variant : variants) {
-            String key = variant.getSize() + "|" + variant.getColor();
+        for (ProductVariant row : rows) {
+            String key = row.getSize() + "|" + row.getColor();
             ProductVariantDTO type = types.get(key);
 
             if (type == null) {
-                type = ProductVariantDTO.fromEntity(variant);
+                type = ProductVariantDTO.fromEntity(row);
                 type.setQuantity(0);
-                type.setStatus(ProductVariantStatus.SOLD);
+                type.setStatus(ProductVariantStatus.SOLD); // mặc định thấp nhất, sẽ được nâng lên bên dưới
                 types.put(key, type);
             }
 
-            if (variant.getStatus() == ProductVariantStatus.AVAILABLE) {
+            if (row.getStatus() == ProductVariantStatus.AVAILABLE) {
                 type.setQuantity(type.getQuantity() + 1);
                 type.setStatus(ProductVariantStatus.AVAILABLE);
-            } else if (variant.getStatus() == ProductVariantStatus.DISCONTINUED) {
+            } else if (row.getStatus() == ProductVariantStatus.DISCONTINUED && type.getStatus() == ProductVariantStatus.SOLD) {
                 type.setStatus(ProductVariantStatus.DISCONTINUED);
             }
         }

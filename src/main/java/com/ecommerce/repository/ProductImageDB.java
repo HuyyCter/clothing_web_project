@@ -28,7 +28,26 @@ public class ProductImageDB {
         query.setParameter("productId", productId);
         return query.getResultList();
     }
+    public static ProductImage findByProductIdAndColor(
+            EntityManager em, int productId, String color) {
 
+        String queryString =
+                "SELECT pi FROM ProductImage pi " +
+                "WHERE pi.product.id = :productId " +
+                "AND LOWER(pi.color) = LOWER(:color) " +
+                "ORDER BY pi.id";
+
+        TypedQuery<ProductImage> query =
+                em.createQuery(queryString, ProductImage.class);
+
+        query.setParameter("productId", productId);
+        query.setParameter("color", color);
+        query.setMaxResults(1);
+
+        List<ProductImage> result = query.getResultList();
+
+        return result.isEmpty() ? null : result.get(0);
+    }
     public static boolean isProductImageIdExists(EntityManager em, int id) {
         String queryString = "SELECT COUNT(pi) FROM ProductImage pi WHERE pi.id = :id";
         TypedQuery<Long> query = em.createQuery(queryString, Long.class);

@@ -10,7 +10,7 @@ import jakarta.persistence.EntityManager;
  * thành công, trạng thái khởi tạo là CONFIRMED. Module MoMo không tự viết logic
  * tạo đơn (thuộc phạm vi thành viên làm Order) mà gọi qua interface này.
  *
- * Thành viên làm Order chỉ cần implement và đăng ký 1 lần khi app khởi động:
+ * Đã được đăng ký sẵn trong config/OrderPaymentHooks (Order.createPaidOrder) khi app khởi động:
  * <pre>
  *   MomoTransaction.registerOrderCreator((em, checkout) -&gt; Order.createPaidOrder(em, checkout));
  * </pre>

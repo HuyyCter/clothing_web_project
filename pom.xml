@@ -65,7 +65,7 @@
     <dependency>
         <groupId>jakarta.persistence</groupId>
         <artifactId>jakarta.persistence-api</artifactId>
-        <version>${jakarta.persistence.version}</version>
+        <version>3.1.0</version>
     </dependency>
     <dependency>
         <groupId>org.hibernate.orm</groupId>

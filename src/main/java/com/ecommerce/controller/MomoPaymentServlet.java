@@ -1,11 +1,7 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.CartDTO;
-import com.ecommerce.dto.MomoCheckoutRequestDTO;
 import com.ecommerce.dto.MomoTransactionDTO;
 import com.ecommerce.exception.BusinessException;
-import com.ecommerce.exception.NotFoundException;
-import com.ecommerce.model.Cart;
 import com.ecommerce.model.MomoTransaction;
 import com.ecommerce.util.MomoUtil;
 import com.ecommerce.validator.MomoValidator;
@@ -24,22 +20,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Servlet thanh toán MoMo.
+ * Servlet nhận kết quả từ cổng MoMo (việc tạo giao dịch nằm ở CheckoutServlet khi khách chọn MoMo).
  * <ul>
- *   <li>GET  /payment/momo         — trang xác nhận (giỏ hàng + chọn địa chỉ) trước khi sang MoMo</li>
- *   <li>POST /payment/momo         — tạo giao dịch, redirect trình duyệt sang payUrl của MoMo</li>
  *   <li>GET  /payment/momo/return  — MoMo đưa khách quay về (redirectUrl), hiển thị kết quả</li>
  *   <li>POST /payment/momo/ipn     — MoMo gọi server-to-server báo kết quả (ipnUrl), trả 204</li>
+ *   <li>GET/POST /payment/momo     — đường dẫn cũ, chuyển về trang /checkout</li>
  * </ul>
- * Trang checkout của module Order có thể POST thẳng tới /payment/momo
- * (tham số: addressId hoặc recipientName/phone/shippingAddress, và note).
+ * /payment/momo/ipn KHÔNG được nằm trong AuthFilter (server MoMo không có session).
  */
 @WebServlet(urlPatterns = {"/payment/momo", "/payment/momo/return", "/payment/momo/ipn"})
 public class MomoPaymentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = Logger.getLogger(MomoPaymentServlet.class.getName());
 
-    private static final String CHECKOUT_VIEW = "/WEB-INF/views/payment/momo-checkout.jsp";
     private static final String RESULT_VIEW = "/WEB-INF/views/payment/momo-result.jsp";
 
     @Override
@@ -48,12 +41,7 @@ public class MomoPaymentServlet extends HttpServlet {
         if ("/payment/momo/return".equals(path)) {
             handleReturn(request, response);
         } else if ("/payment/momo".equals(path)) {
-            Integer userId = getUserId(request);
-            if (userId == null) {
-                response.sendRedirect(request.getContextPath() + "/login");
-                return;
-            }
-            renderCheckout(request, response, userId, null, null);
+            response.sendRedirect(request.getContextPath() + "/checkout");
         } else {
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
@@ -67,7 +55,7 @@ public class MomoPaymentServlet extends HttpServlet {
         if ("/payment/momo/ipn".equals(path)) {
             handleIpn(request, response);
         } else if ("/payment/momo".equals(path)) {
-            handleCreate(request, response);
+            response.sendRedirect(request.getContextPath() + "/checkout");
         } else {
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
@@ -76,29 +64,6 @@ public class MomoPaymentServlet extends HttpServlet {
     // ==========================================
     // HANDLERS
     // ==========================================
-
-    private void handleCreate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Integer userId = getUserId(request);
-        if (userId == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        MomoCheckoutRequestDTO form = readForm(request);
-        String error = MomoValidator.validateCheckout(form);
-        if (error != null) {
-            renderCheckout(request, response, userId, form, error);
-            return;
-        }
-
-        try {
-            String payUrl = MomoTransaction.initiate(userId, form);
-            // Redirect (không forward) vì phải đổi sang domain của MoMo — đúng ngoại lệ trong code-standards.md
-            response.sendRedirect(payUrl);
-        } catch (BusinessException | NotFoundException e) {
-            renderCheckout(request, response, userId, form, e.getMessage());
-        }
-    }
 
     private void handleReturn(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Map<String, String> params = new LinkedHashMap<>();
@@ -148,41 +113,6 @@ public class MomoPaymentServlet extends HttpServlet {
             LOG.log(Level.SEVERE, "[MoMo] Lỗi xử lý IPN", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    // ==========================================
-    // HELPERS
-    // ==========================================
-
-    private void renderCheckout(HttpServletRequest request, HttpServletResponse response, int userId,
-            MomoCheckoutRequestDTO form, String formError) throws ServletException, IOException {
-        CartDTO cart = Cart.getCart((long) userId);
-        request.setAttribute("cart", cart);
-        request.setAttribute("addresses", MomoTransaction.getAddressOptions(userId));
-        request.setAttribute("form", form != null ? form : new MomoCheckoutRequestDTO());
-        request.setAttribute("minAmount", MomoTransaction.MIN_AMOUNT);
-        request.setAttribute("maxAmount", MomoTransaction.MAX_AMOUNT);
-        if (formError != null) {
-            request.setAttribute("formError", formError);
-        }
-        request.getRequestDispatcher(CHECKOUT_VIEW).forward(request, response);
-    }
-
-    private MomoCheckoutRequestDTO readForm(HttpServletRequest request) {
-        MomoCheckoutRequestDTO dto = new MomoCheckoutRequestDTO();
-        String addressId = request.getParameter("addressId");
-        if (addressId != null && !addressId.trim().isEmpty() && !"new".equals(addressId.trim())) {
-            try {
-                dto.setAddressId(Integer.parseInt(addressId.trim()));
-            } catch (NumberFormatException e) {
-                dto.setAddressId(-1); // validator sẽ báo lỗi
-            }
-        }
-        dto.setRecipientName(request.getParameter("recipientName"));
-        dto.setPhone(request.getParameter("phone"));
-        dto.setShippingAddress(request.getParameter("shippingAddress"));
-        dto.setNote(request.getParameter("note"));
-        return dto;
     }
 
     /** userId lấy từ session (LoginServlet lưu kiểu Integer) — không tin tham số request. */

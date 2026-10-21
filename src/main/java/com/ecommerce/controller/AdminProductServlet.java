@@ -237,7 +237,7 @@ public class AdminProductServlet extends HttpServlet {
 	// PRIVATE HELPERS
 	// ==========================================
 	private void showList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.setAttribute("products", Product.getAll());
+		request.setAttribute("products", Product.getAll(0, 1000));
 		request.getRequestDispatcher(LIST_VIEW).forward(request, response);
 	}
 

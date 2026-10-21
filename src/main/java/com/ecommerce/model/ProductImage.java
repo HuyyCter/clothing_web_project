@@ -142,14 +142,6 @@ public class ProductImage {
         }
     }
 
-    public static List<ProductImageDTO> toDTOs(List<ProductImage> images) {
-        List<ProductImageDTO> result = new ArrayList<>();
-        for (ProductImage image : images) {
-            result.add(ProductImageDTO.fromEntity(image));
-        }
-        return result;
-    }
-
     // ==========================================
     // PRIVATE HELPERS
     // ==========================================
